@@ -1,0 +1,5 @@
+Must be built with visual studio 2010 and sdk 7.1
+
+If you install visual studio 2012 eclipse uses the CL and libraries from there which breaks windows xp compatibility.
+
+http://www.dependencywalker.com/ shows what OS version and other useful info about a DLL

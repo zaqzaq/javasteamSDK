@@ -1,0 +1,331 @@
+package steam;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
+import java.util.Random;
+
+import junit.framework.TestCase;
+
+import org.junit.Test;
+
+public class TestUserStats extends TestCase {
+	
+	private static Thread callbackThread;
+	
+	protected void setUp() throws Exception {
+		steam_api.getLogger().info("setUp: initializing Steam.");
+		steam_api.loadNativeLibrariesFromJavaLibraryPath();
+		steam_api.SteamAPI_Init(steam_apiTest.STEAM_APP_ID_TEST);
+		callbackThread = startRunCallbackThread();
+	}
+	
+	@SuppressWarnings("deprecation")
+	protected void tearDown() throws Exception {
+		callbackThread.stop();
+		steam_api.SteamAPI_Shutdown();
+	}
+	
+	@Test
+	public void testStatsCatch() throws Throwable{
+		try{
+			stats();
+		}catch(Throwable t){
+			t.printStackTrace();
+			throw t;
+		}
+	}
+	
+	@SuppressWarnings("unused")
+	private boolean ioFailure = false;
+	private LeaderboardScoreUploaded_t scoreUpload;
+	private LeaderboardScoresDownloaded_t scoreDownload;
+	private LeaderboardFindResult_t foundLeaderboard;
+	
+	public void stats() throws Exception{
+		final Object onUploadScoreMutex = new Object();
+		final Object onLeaderboardScoresDownloadedMutex = new Object();
+		final Object onFindLeaderboardMutex = new Object();
+		
+		ISteamUserStatsListener statsListener = new ISteamUserStatsListener() {
+			public void OnUploadScore(LeaderboardScoreUploaded_t pScoreUploadedResult, boolean bIOFailure) {
+				ioFailure = bIOFailure;
+				scoreUpload = pScoreUploadedResult;
+				synchronized(onUploadScoreMutex){
+					onUploadScoreMutex.notifyAll();
+				}
+			}
+			
+			public void OnLeaderboardScoresDownloaded(LeaderboardScoresDownloaded_t pParam, boolean ioFailure) {
+				TestUserStats.this.ioFailure = ioFailure;
+				scoreDownload = pParam;
+				synchronized(onLeaderboardScoresDownloadedMutex){
+					onLeaderboardScoresDownloadedMutex.notifyAll();
+				}
+			}
+			
+			public void OnFindLeaderboard(LeaderboardFindResult_t pFindLeaderboardResult, boolean bIOFailure) {
+				TestUserStats.this.ioFailure = bIOFailure;
+				foundLeaderboard = pFindLeaderboardResult;
+				synchronized (onFindLeaderboardMutex) {
+					onFindLeaderboardMutex.notifyAll();
+				}
+			}
+		};
+		ISteamUserStats.addListener(statsListener);
+		
+		/*
+		 * ************* Find a leaderboard by name **********************
+		 */
+		ISteamUserStats.FindLeaderboard("Quickest Win");
+		synchronized(onFindLeaderboardMutex){
+			onFindLeaderboardMutex.wait(3000);
+		}
+		if(foundLeaderboard == null){
+			throw new Exception("Couldnt find leader board...");
+		}
+		System.out.println("Found leaderboard getM_bLeaderboardFound = " + foundLeaderboard.getM_bLeaderboardFound());
+		System.out.println("Found leaderboard getM_hSteamLeaderboard = " + foundLeaderboard.getM_hSteamLeaderboard());
+		
+		/*
+		 * find leaderboard using instanced listener api
+		 */
+		SteamUserStatsListener listener = new SteamUserStatsListener() {
+			public void onUploadScore(LeaderboardScoreUploaded_t pScoreUploadedResult, boolean bIOFailure) {
+				ioFailure = bIOFailure;
+				scoreUpload = pScoreUploadedResult;
+				synchronized(onUploadScoreMutex){
+					onUploadScoreMutex.notifyAll();
+				}
+			}
+			
+			public void onLeaderboardScoresDownloaded(LeaderboardScoresDownloaded_t pParam, boolean ioFailure) {
+				TestUserStats.this.ioFailure = ioFailure;
+				scoreDownload = pParam;
+				synchronized(onLeaderboardScoresDownloadedMutex){
+					onLeaderboardScoresDownloadedMutex.notifyAll();
+				}
+			}
+			
+			public void onFindLeaderboard(LeaderboardFindResult_t pFindLeaderboardResult, boolean bIOFailure) {
+				TestUserStats.this.ioFailure = bIOFailure;
+				foundLeaderboard = pFindLeaderboardResult;
+				synchronized (onFindLeaderboardMutex) {
+					onFindLeaderboardMutex.notifyAll();
+				}
+			}
+		};
+		ISteamUserStats.FindLeaderboard("Quickest Win", listener);
+		synchronized(onFindLeaderboardMutex){
+			onFindLeaderboardMutex.wait(3000);
+		}
+		if(foundLeaderboard == null){
+			throw new Exception("Couldnt find leader board...");
+		}
+		System.out.println("============= Found Leaderboard listener api ========================");
+		System.out.println("Found leaderboard getM_bLeaderboardFound = " + foundLeaderboard.getM_bLeaderboardFound());
+		System.out.println("Found leaderboard getM_hSteamLeaderboard = " + foundLeaderboard.getM_hSteamLeaderboard());
+		
+		/*
+		 * ************* Download top 10 entries for a leaderboard **********************
+		 */
+		ISteamUserStats.DownloadLeaderboardEntries(foundLeaderboard.getM_hSteamLeaderboard(), ELeaderboardDataRequest.k_ELeaderboardDataRequestGlobal, 0, 10);
+		synchronized(onLeaderboardScoresDownloadedMutex){
+			onLeaderboardScoresDownloadedMutex.wait(3000);
+		}
+		if(scoreDownload == null){
+			throw new Exception("Couldn't download leaderboard entries...");
+		}
+		System.out.println("Scores downloaded scoreDownload.getM_cEntryCount() = " + scoreDownload.getM_cEntryCount());
+		System.out.println("Scores downloaded getM_hSteamLeaderboard() = " + scoreDownload.getM_hSteamLeaderboard());
+		System.out.println("Scores downloaded getM_hSteamLeaderboardEntries() = " + scoreDownload.getM_hSteamLeaderboardEntries());
+		
+		System.out.println("Leaderboard entries:");
+		for(int i = 0; i < scoreDownload.getM_cEntryCount(); i++){
+			LeaderboardEntry_t entry = new LeaderboardEntry_t();
+			IntBuffer pDetails = ByteBuffer.allocateDirect(3 * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
+			boolean gotEntry = ISteamUserStats.GetDownloadedLeaderboardEntry(scoreDownload.getM_hSteamLeaderboardEntries(), i, entry, pDetails);
+			System.out.println("gotEntry = " + gotEntry);
+			System.out.println("entry.getM_cDetails() = " + entry.getM_cDetails());
+			System.out.println("entry.getM_hUGC() = " + entry.getM_hUGC());
+			System.out.println("entry.getM_nGlobalRank() = " + entry.getM_nGlobalRank());
+			System.out.println("entry.getM_nScore() = " + entry.getM_nScore());
+			System.out.println("entry.getM_steamIDUser() = " + entry.getM_steamIDUser());
+			System.out.println("Persona name = " + ISteamFriends.GetFriendPersonaName(entry.getM_steamIDUser()));
+			System.out.println();
+		}
+		
+		/*
+		 * ************* Submit a new score **********************
+		 */
+		Random rand = new Random();
+		IntBuffer scoreData = ByteBuffer.allocateDirect(300 * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
+		while(scoreData.remaining() > 0){
+			scoreData.put(rand.nextInt());
+		}
+		scoreData.clear();
+		ISteamUserStats.UploadLeaderboardScore(foundLeaderboard.getM_hSteamLeaderboard(), ELeaderboardUploadScoreMethod.k_ELeaderboardUploadScoreMethodForceUpdate, Integer.MAX_VALUE, scoreData);
+		synchronized(onUploadScoreMutex){
+			onUploadScoreMutex.wait(3000);
+		}
+		if(scoreUpload == null){
+			throw new Exception("Failed to upload score...");
+		}
+		System.out.println("scoreUpload.getM_bScoreChanged() = " + scoreUpload.getM_bScoreChanged());
+		System.out.println("scoreUpload.getM_bSuccess() = " + scoreUpload.getM_bSuccess());
+		System.out.println("scoreUpload.getM_hSteamLeaderboard() = " + scoreUpload.getM_hSteamLeaderboard());
+		System.out.println("scoreUpload.getM_nGlobalRankNew() = " + scoreUpload.getM_nGlobalRankNew());
+		System.out.println("scoreUpload.getM_nGlobalRankPrevious() = " + scoreUpload.getM_nGlobalRankPrevious());
+		System.out.println("scoreUpload.getM_nScore()= " + scoreUpload.getM_nScore());
+		
+		/*
+		 * ************* get score and data for this user *******************
+		 */
+		scoreDownload = null;
+		ISteamUserStats.DownloadLeaderboardEntriesForUsers(foundLeaderboard.getM_hSteamLeaderboard(), ISteamUser.GetSteamID(), 1);
+		synchronized(onLeaderboardScoresDownloadedMutex){
+			onLeaderboardScoresDownloadedMutex.wait(3000);
+		}
+		if(scoreDownload == null){
+			throw new Exception("Couldn't get score for this user");
+		}
+		System.out.println("Scores downloaded scoreDownload.getM_cEntryCount() = " + scoreDownload.getM_cEntryCount());
+		System.out.println("Scores downloaded getM_hSteamLeaderboard() = " + scoreDownload.getM_hSteamLeaderboard());
+		System.out.println("Scores downloaded getM_hSteamLeaderboardEntries() = " + scoreDownload.getM_hSteamLeaderboardEntries());
+		
+		System.out.println("Leaderboard entries:");
+		for(int i = 0; i < scoreDownload.getM_cEntryCount(); i++){
+			LeaderboardEntry_t entry = new LeaderboardEntry_t();
+			IntBuffer pDetails = ByteBuffer.allocateDirect(3 * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
+			boolean gotEntry = ISteamUserStats.GetDownloadedLeaderboardEntry(scoreDownload.getM_hSteamLeaderboardEntries(), i, entry, pDetails);
+			System.out.println("gotEntry = " + gotEntry);
+			System.out.println("entry.getM_cDetails() = " + entry.getM_cDetails());
+			System.out.println("entry.getM_hUGC() = " + entry.getM_hUGC());
+			System.out.println("entry.getM_nGlobalRank() = " + entry.getM_nGlobalRank());
+			System.out.println("entry.getM_nScore() = " + entry.getM_nScore());
+			System.out.println("entry.getM_steamIDUser() = " + entry.getM_steamIDUser());
+			System.out.println("Persona name = " + ISteamFriends.GetFriendPersonaName(entry.getM_steamIDUser()));
+			System.out.println();
+		}
+		
+		/*
+		 * ************* create a new nimbly games leaderboard *******************
+		 */
+		System.out.println("================= =================");
+		System.out.println("================= Custom leaderboard =================");
+		System.out.println("================= =================");
+		System.out.println("================= =================");
+		foundLeaderboard = null;
+		ISteamUserStats.FindOrCreateLeaderboard("NimblyGamesLLC", ELeaderboardSortMethod.k_ELeaderboardSortMethodDescending, ELeaderboardDisplayType.k_ELeaderboardDisplayTypeNumeric, listener);
+		synchronized(onFindLeaderboardMutex){
+			onFindLeaderboardMutex.wait(3000);
+		}
+		if(foundLeaderboard == null){
+			throw new Exception("Couldnt find custom leaderboard NimblyGamesLLC");
+		}
+		System.out.println("Found leaderboard getM_bLeaderboardFound = " + foundLeaderboard.getM_bLeaderboardFound());
+		System.out.println("Found leaderboard getM_hSteamLeaderboard = " + foundLeaderboard.getM_hSteamLeaderboard());
+		System.out.println("Leaderboard name = " + ISteamUserStats.GetLeaderboardName(foundLeaderboard.getM_hSteamLeaderboard()));
+		
+		/*
+		 * ************* Download top 10 entries for custom nimbly games leaderboard **********************
+		 */
+		scoreDownload = null;
+		ISteamUserStats.DownloadLeaderboardEntries(foundLeaderboard.getM_hSteamLeaderboard(), ELeaderboardDataRequest.k_ELeaderboardDataRequestGlobal, 0, 10, listener);
+		synchronized(onLeaderboardScoresDownloadedMutex){
+			onLeaderboardScoresDownloadedMutex.wait(3000);
+		}
+		if(scoreDownload == null){
+			throw new Exception("Couldn't download leaderboard entries...");
+		}
+		System.out.println("Scores downloaded scoreDownload.getM_cEntryCount() = " + scoreDownload.getM_cEntryCount());
+		System.out.println("Scores downloaded getM_hSteamLeaderboard() = " + scoreDownload.getM_hSteamLeaderboard());
+		System.out.println("Scores downloaded getM_hSteamLeaderboardEntries() = " + scoreDownload.getM_hSteamLeaderboardEntries());
+		
+		System.out.println("Leaderboard entries:");
+		for(int i = 0; i < scoreDownload.getM_cEntryCount(); i++){
+			LeaderboardEntry_t entry = new LeaderboardEntry_t();
+			IntBuffer pDetails = ByteBuffer.allocateDirect(3 * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
+			boolean gotEntry = ISteamUserStats.GetDownloadedLeaderboardEntry(scoreDownload.getM_hSteamLeaderboardEntries(), i, entry, pDetails);
+			System.out.println("gotEntry = " + gotEntry);
+			System.out.println("entry.getM_cDetails() = " + entry.getM_cDetails());
+			System.out.println("entry.getM_hUGC() = " + entry.getM_hUGC());
+			System.out.println("entry.getM_nGlobalRank() = " + entry.getM_nGlobalRank());
+			System.out.println("entry.getM_nScore() = " + entry.getM_nScore());
+			System.out.println("entry.getM_steamIDUser() = " + entry.getM_steamIDUser());
+			System.out.println("Persona name = " + ISteamFriends.GetFriendPersonaName(entry.getM_steamIDUser()));
+			System.out.println();
+		}
+		
+		/*
+		 * ************* Submit a new score for custom leaderboard **********************
+		 */
+		scoreData = ByteBuffer.allocateDirect(300 * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
+		while(scoreData.remaining() > 0){
+			scoreData.put(rand.nextInt());
+		}
+		scoreData.clear();
+		ISteamUserStats.UploadLeaderboardScore(foundLeaderboard.getM_hSteamLeaderboard(), ELeaderboardUploadScoreMethod.k_ELeaderboardUploadScoreMethodForceUpdate, 1, scoreData, listener);
+		synchronized(onUploadScoreMutex){
+			onUploadScoreMutex.wait(3000);
+		}
+		if(scoreUpload == null){
+			throw new Exception("Failed to upload score...");
+		}
+		System.out.println("scoreUpload.getM_bScoreChanged() = " + scoreUpload.getM_bScoreChanged());
+		System.out.println("scoreUpload.getM_bSuccess() = " + scoreUpload.getM_bSuccess());
+		System.out.println("scoreUpload.getM_hSteamLeaderboard() = " + scoreUpload.getM_hSteamLeaderboard());
+		System.out.println("scoreUpload.getM_nGlobalRankNew() = " + scoreUpload.getM_nGlobalRankNew());
+		System.out.println("scoreUpload.getM_nGlobalRankPrevious() = " + scoreUpload.getM_nGlobalRankPrevious());
+		System.out.println("scoreUpload.getM_nScore()= " + scoreUpload.getM_nScore());
+		
+		/*
+		 * ************* get score and data for this user on custom nimblygames leaderboard *******************
+		 */
+		scoreDownload = null;
+		ISteamUserStats.DownloadLeaderboardEntriesForUsers(foundLeaderboard.getM_hSteamLeaderboard(), ISteamUser.GetSteamID(), 1, listener);
+		synchronized(onLeaderboardScoresDownloadedMutex){
+			onLeaderboardScoresDownloadedMutex.wait(3000);
+		}
+		if(scoreDownload == null){
+			throw new Exception("Couldn't get score for this user");
+		}
+		System.out.println("Scores downloaded scoreDownload.getM_cEntryCount() = " + scoreDownload.getM_cEntryCount());
+		System.out.println("Scores downloaded getM_hSteamLeaderboard() = " + scoreDownload.getM_hSteamLeaderboard());
+		System.out.println("Scores downloaded getM_hSteamLeaderboardEntries() = " + scoreDownload.getM_hSteamLeaderboardEntries());
+		
+		System.out.println("Leaderboard entries:");
+		for(int i = 0; i < scoreDownload.getM_cEntryCount(); i++){
+			LeaderboardEntry_t entry = new LeaderboardEntry_t();
+			IntBuffer pDetails = ByteBuffer.allocateDirect(3 * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
+			boolean gotEntry = ISteamUserStats.GetDownloadedLeaderboardEntry(scoreDownload.getM_hSteamLeaderboardEntries(), i, entry, pDetails);
+			System.out.println("gotEntry = " + gotEntry);
+			System.out.println("entry.getM_cDetails() = " + entry.getM_cDetails());
+			System.out.println("entry.getM_hUGC() = " + entry.getM_hUGC());
+			System.out.println("entry.getM_nGlobalRank() = " + entry.getM_nGlobalRank());
+			System.out.println("entry.getM_nScore() = " + entry.getM_nScore());
+			System.out.println("entry.getM_steamIDUser() = " + entry.getM_steamIDUser());
+			System.out.println("Persona name = " + ISteamFriends.GetFriendPersonaName(entry.getM_steamIDUser()));
+			System.out.println();
+		}
+	}
+	
+	private static Thread startRunCallbackThread() {
+		Thread thread = new Thread(new Runnable() {
+			public void run() {
+				while (true) {
+					steam_api.SteamAPI_RunCallbacks();
+					try {
+						Thread.sleep(50);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+		thread.setDaemon(true);
+		thread.start();
+		return thread;
+	}
+
+}

@@ -1,0 +1,13 @@
+.gradle
+build/
+
+# eclipse
+bin/
+.settings/
+.classpath
+.project
+.pydevproject
+
+# idea
+.idea/
+*.iml

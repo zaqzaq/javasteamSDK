@@ -1,0 +1,247 @@
+import java.nio.file.CopyOption
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
+import org.gradle.api.internal.artifacts.publish.DefaultPublishArtifact
+import groovy.swing.SwingBuilder
+
+apply from: "../build.gradle"
+apply plugin: 'java'
+apply plugin: 'cpp'
+
+
+buildscript {
+	repositories { jcenter() }
+	dependencies { classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release" }
+}
+
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.artifactory'
+
+ext{ steamSdkDirPath = "${projectDir}/sdk/sdk_135" }
+
+repositories { jcenter() }
+
+dependencies {
+	// projects
+	//	compile project(":LZMA")
+
+	// test
+	testCompile "junit:junit:${junitVersion}"
+
+	// logging
+	compile "org.slf4j:slf4j-api:${slf4jVersion}"
+	runtime "org.slf4j:log4j-over-slf4j:${slf4jVersion}"
+	runtime "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+}
+
+publishing {
+	publications {
+		steamjnix86Publish(MavenPublication) {
+			groupId 'com.nimblygames'
+			artifactId 'steamjni'
+			version '1.0'
+
+			artifact extension: 'dll', source: "$projectDir/dist/steamjni.dll"
+		}
+
+		steamjnix64Publish(MavenPublication) {
+			groupId 'com.nimblygames'
+			artifactId 'steamjni64'
+			version '1.0'
+
+			artifact extension: 'dll', source: "$projectDir/dist/steamjni64.dll"
+		}
+	}
+}
+
+// generate headers
+task nativeHeaders {
+	def outputDirectory = file("src/steamjni/cpp")
+	def classes = [
+		'steam.steam_api',
+		'steam.ISteamUserStats',
+		'steam.ISteamFriends',
+		'steam.ISteamUser',
+		'steam.ISteamUtils',
+		'steam.steam_gameserver',
+		'steam.ISteamGameServer',
+		'steam.ISteamRemoteStorage',
+		'steam.SteamUserStatsListener',
+		'steam.ISteamController',
+		'steam.ISteamApps'
+	]
+	inputs.files sourceSets.main.output
+	inputs.property('classes', classes)
+	outputs.file outputDirectory
+	doLast {
+		outputDirectory.parentFile.mkdirs()
+		exec {
+			executable org.gradle.internal.jvm.Jvm.current().getExecutable('javah')
+			args '-d', outputDirectory
+			args '-classpath', sourceSets.main.output.classesDirs.asPath
+			args classes
+		}
+	}
+}
+
+// always run header generation after classes are created
+classes.finalizedBy nativeHeaders
+
+// C++
+model {
+	platforms {
+		x86 { architecture "x86" }
+		x64 { architecture "x86_64" }
+	}
+
+	toolChains {
+		vc(VisualCpp) {
+			installDir "C:/Program Files (x86)/Microsoft Visual Studio 10.0"
+			windowsSdkDir "C:/Program Files (x86)/Microsoft SDKs/Windows/v7.1A"
+		}
+	}
+
+	components{
+		steamjni(NativeLibrarySpec){
+			targetPlatform "x86"
+			targetPlatform "x64"
+
+
+			binaries.withType(StaticLibraryBinarySpec) { buildable = false }
+
+			binaries.withType(SharedLibraryBinarySpec) {
+				if (toolChain in VisualCpp) {
+					cppCompiler.define "DLL_EXPORT"
+					cppCompiler.define 'NG_WIN'
+					cppCompiler.define '_WIN32'
+					cppCompiler.define '_MSC_VER=1600'
+					cppCompiler.define 'WIN32'
+					cppCompiler.define 'UNICODE'
+					cppCompiler.define '_UNICODE'
+
+					cppCompiler.args '/O2'
+					cppCompiler.args '/EHs'
+					cppCompiler.args '/MT'
+					cppCompiler.args '/nologo'
+					cppCompiler.args "/IC:/Program Files (x86)/Java/jdk6/include"
+					cppCompiler.args "/IC:/Program Files (x86)/Java/jdk6/include/win32"
+					cppCompiler.args "/I${steamSdkDirPath}/public"
+
+					linker.args '/nologo'
+					if(targetPlatform.name== "x86") {
+						linker.args "/libpath:${steamSdkDirPath}/public/steam/lib/win32"
+						linker.args "/libpath:${steamSdkDirPath}/redistributable_bin"
+						linker.args 'steam_api.lib'
+					}
+					if(targetPlatform.name== "x64") {
+						linker.args "/libpath:${steamSdkDirPath}/public/steam/lib/win32"
+						linker.args "/libpath:${steamSdkDirPath}/redistributable_bin/win64"
+						linker.args 'steam_api64.lib'
+					}
+					linker.args 'User32.lib'
+				}
+			}
+		}
+	}
+}
+
+task distribute (dependsOn: [
+	'classes',
+	'nativeHeaders',
+	'buildDependentsSteamjniX86SharedLibrary',
+	'buildDependentsSteamjniX64SharedLibrary'
+]){
+	description = "Copy all dll's to the dist folder"
+	group = "Distribution"
+	doLast{
+		// copy x86 dll
+		def steamjni86Dll = Paths.get("$projectDir/build/libs/steamjni/shared/x86/steamjni.dll")
+		def steamjni86DllDist = Paths.get("$projectDir/dist/steamjni.dll")
+		steamjni86DllDist.toFile().getParentFile().mkdirs()
+		Files.copy(steamjni86Dll, steamjni86DllDist, StandardCopyOption.REPLACE_EXISTING)
+
+		// copy x64 dll
+		def steamjni64Dll = Paths.get("$projectDir/build/libs/steamjni/shared/x64/steamjni.dll")
+		def steamjni64DllDist = Paths.get("$projectDir/dist/steamjni64.dll")
+		steamjni64DllDist.toFile().getParentFile().mkdirs()
+		Files.copy(steamjni64Dll, steamjni64DllDist, StandardCopyOption.REPLACE_EXISTING)
+	}
+}
+
+artifactory {
+	contextUrl = 'https://artifactory.nimblygames.com/artifactory'   //The base Artifactory URL if not overridden by the publisher/resolver
+	publish {
+		//		defaults {
+		//			publications ('mavenJava')
+		//			publishConfigs('archives')
+		//		}
+
+		//		properties {
+		//Optional closure to attach properties to artifacts based on a list of artifact patterns per project publication
+		//			foo '*:*:*:*@*', platform: 'linux', 'win64'                //The property platform=linux,win64 will be set on all artifacts in foo publication
+		//			mavenJava 'org.jfrog:*:*:*@*', key1: 'val1'                //The property key1=val1 will be set on all artifacts part of the mavenJava publication and with group org.jfrog
+		//			all 'org.jfrog:shared:1.?:*@*', key2: 'val2', key3: 'val3' //The properties key2 and key3 will be set on all published artifacts (all publications) with group:artifact:version
+		//																	   //equal to org.jfrog:shared:1.?
+		//		}
+		publishBuildInfo = true   //Publish build-info to Artifactory (true by default)
+		publishArtifacts = true   //Publish artifacts to Artifactory (true by default)
+		publishPom = true   //Publish generated POM files to Artifactory (true by default).
+		publishIvy = false   //Publish generated Ivy descriptor files to Artifactory (true by default).
+	}
+	clientConfig.info.setBuildName('version')
+	clientConfig.info.setBuildNumber('1')
+
+	//	clientConfig.publisher.repoKey = 'gradle-release-local'
+	//	clientConfig.publisher.username = getPassword.username
+	//	clientConfig.publisher.password = getPassword.password
+}
+
+artifactoryPublish {
+	//	doLast{
+	skip = false //Skip build info analysis and publishing (false by default)
+	properties { steamjnix86Publish '**:**:**:*@*', platform: 'win32' }
+	println "username = ${clientConfig.publisher.username}"
+	publications ('steamjnix86Publish', 'steamjnix64Publish')
+	//	}
+
+	doLast{
+		clientConfig.publisher.repoKey = 'gradle-release-local'
+		clientConfig.publisher.username = promptUser("username:")
+		clientConfig.publisher.password = promptUser("password:");
+	}
+}
+
+def promptUser (prompt) {
+	def pass = ''
+	if(System.console() == null) {
+		new SwingBuilder().edt {
+			dialog(modal: true, // Otherwise the build will continue running before you closed the dialog
+			title: prompt, // Dialog title
+			alwaysOnTop: true, // pretty much what the name says
+			resizable: false, // Don't allow the user to resize the dialog
+			locationRelativeTo: null, // Place dialog in center of the screen
+			pack: true, // We need to pack the dialog (so it will take the size of it's children)
+			show: true // Let's show it
+			) {
+				vbox {
+					// Put everything below each other
+					label(text: prompt)
+					input = passwordField()
+					button(defaultButton: true, text: 'OK', actionPerformed: {
+						pass = new String(input.password); // Set pass variable to value of input field
+						dispose(); // Close dialog
+					})
+				} // vbox end
+			} // dialog end
+		} // edt end
+	} else {
+		pass = System.console().readPassword("\n${prompt} ")
+		pass = new String(pass)
+	}
+
+	if(pass.size() <= 0) {
+		throw new InvalidUserDataException("You must enter ${prompt} to proceed.")
+	}
+	return pass;
+}
