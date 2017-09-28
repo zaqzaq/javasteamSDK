@@ -5,6 +5,7 @@ import java.nio.file.StandardCopyOption
 import org.gradle.api.internal.artifacts.publish.DefaultPublishArtifact
 import groovy.swing.SwingBuilder
 
+//apply from: project(':steam').projectDir.getAbsolutePath() + "/build.gradle"
 apply from: "../build.gradle"
 apply plugin: 'java'
 apply plugin: 'cpp'
@@ -31,8 +32,6 @@ dependencies {
 
 	// logging
 	compile "org.slf4j:slf4j-api:${slf4jVersion}"
-	runtime "org.slf4j:log4j-over-slf4j:${slf4jVersion}"
-	runtime "org.apache.logging.log4j:log4j-core:${log4jVersion}"
 }
 
 publishing {
