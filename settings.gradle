@@ -15,6 +15,6 @@ include 'api'
 include 'services:webservice'
 */
 
-include 'SteamSdk'
-
 rootProject.name = 'steam'
+
+include 'SteamSdk'

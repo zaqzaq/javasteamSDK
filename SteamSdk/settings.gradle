@@ -1,3 +1,0 @@
-include 'steam'
-project(':steam').projectDir = new File('../steam')
-rootProject.name = 'SteamSdk'
