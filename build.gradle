@@ -1,14 +1,6 @@
+apply from: project(':core').projectDir.getAbsolutePath() + "/build.gradle"
+
 allprojects {
-//	apply plugin: 'java'
-//	sourceCompatibility = 1.8
-//	targetCompatibility = 1.8
 }
 ext{
-//	bouncyCastleVersion = '1.56'
-//	jsonSimpleVersion = '20170516'
-//	jdomVersion = '2.0.2'
-	slf4jVersion = '1.7.25'
-//	libgdxVersion = '1.9.6'
-	log4jVersion = '2.8.2'
-	junitVersion = '4.12'
 }

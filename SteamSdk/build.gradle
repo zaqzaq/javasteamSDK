@@ -7,6 +7,8 @@ import groovy.swing.SwingBuilder
 
 apply from: file('../build.gradle')
 apply plugin: 'java'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 apply plugin: 'cpp'
 
 buildscript {
@@ -22,9 +24,6 @@ ext{ steamSdkDirPath = "${projectDir}/sdk/sdk_135" }
 repositories { jcenter() }
 
 dependencies {
-	// projects
-	//	compile project(":LZMA")
-
 	// test
 	testCompile "junit:junit:${junitVersion}"
 

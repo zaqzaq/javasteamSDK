@@ -1,6 +1,10 @@
 package steam;
 
 import java.io.File;
+import java.lang.invoke.MethodHandles;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import steam.exception.SteamException;
 
@@ -11,15 +15,7 @@ public class steam_api {
 	private static boolean initCalled = false;
 	private static boolean initSuccessFul = false;
 
-	private static SteamLogger steamLogger = new DefaultSteamLogger();
-
-	public static void setLogger(SteamLogger steamLogger) {
-		steam_api.steamLogger = steamLogger;
-	}
-
-	public static SteamLogger getLogger() {
-		return steam_api.steamLogger;
-	}
+	private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
 	private static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 
@@ -35,7 +31,7 @@ public class steam_api {
 			System.loadLibrary("steam_api");
 			System.loadLibrary("steam.jni");
 		}
-		getLogger().info("Steam library loaded");
+		LOG.info("Steam library loaded");
 		loadedLibraries = true;
 	}
 
@@ -45,7 +41,7 @@ public class steam_api {
 	// NOTE: os.arch is based on the architecture of the currently running JVM (not the computer's Operating System)
 	static public boolean is64Bit = System.getProperty("os.arch").equals("amd64") || System.getProperty("os.arch").equals("x86_64");
 
-	public static void loadLibrary(File dir, String libraryName) {
+	public static void loadLibrary(final File dir, final String libraryName) {
 		String filename;
 		if (isWindows) {
 			filename = libraryName + (is64Bit ? "64.dll" : ".dll");
@@ -59,21 +55,21 @@ public class steam_api {
 		System.load(new File(dir, filename).getAbsolutePath());
 	}
 
-	public static synchronized void loadNativeLibrariesFromDir(File steamNativeDir) {
+	public static synchronized void loadNativeLibrariesFromDir(final File steamNativeDir) {
 		if (loadedLibraries) {
 			return;
 		}
 		attemptedToLoadLibraries = true;
 
 		loadLibrary(steamNativeDir, "steam_api");
-		getLogger().info("Steam library api loaded");
+		LOG.info("Steam library api loaded");
 		loadLibrary(steamNativeDir, "steam.jni");
-		getLogger().info("Steam library jni loaded");
+		LOG.info("Steam library jni loaded");
 
 		loadedLibraries = true;
 	}
 
-	public static final void SteamAPI_Init(long steamAppId) throws SteamException {
+	public static final void SteamAPI_Init(final long steamAppId) throws SteamException {
 		initCalled = true;
 		nSteamAPI_Init(steamAppId);
 		initSuccessFul = true;
@@ -93,8 +89,8 @@ public class steam_api {
 
 	private static final native void nSteamAPI_RunCallbacks();
 
-	public static final void logFromNative(String strToLog) {
-		getLogger().info("Steam: " + strToLog);
+	public static final void logFromNative(final String strToLog) {
+		LOG.info("Steam: " + strToLog);
 	}
 
 	public static boolean isAttemptedToLoadLibraries() {

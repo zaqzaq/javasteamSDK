@@ -1,70 +1,79 @@
 package steam;
 
+import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.Random;
 
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import junit.framework.TestCase;
 
-import org.junit.Test;
-
 public class TestUserStats extends TestCase {
-	
+	private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
 	private static Thread callbackThread;
-	
+
+	@Override
 	protected void setUp() throws Exception {
-		steam_api.getLogger().info("setUp: initializing Steam.");
+		LOG.info("setUp: initializing Steam.");
 		steam_api.loadNativeLibrariesFromJavaLibraryPath();
 		steam_api.SteamAPI_Init(steam_apiTest.STEAM_APP_ID_TEST);
 		callbackThread = startRunCallbackThread();
 	}
-	
+
+	@Override
 	@SuppressWarnings("deprecation")
 	protected void tearDown() throws Exception {
 		callbackThread.stop();
 		steam_api.SteamAPI_Shutdown();
 	}
-	
+
 	@Test
-	public void testStatsCatch() throws Throwable{
-		try{
+	public void testStatsCatch() throws Throwable {
+		try {
 			stats();
-		}catch(Throwable t){
+		} catch (final Throwable t) {
 			t.printStackTrace();
 			throw t;
 		}
 	}
-	
+
 	@SuppressWarnings("unused")
 	private boolean ioFailure = false;
 	private LeaderboardScoreUploaded_t scoreUpload;
 	private LeaderboardScoresDownloaded_t scoreDownload;
 	private LeaderboardFindResult_t foundLeaderboard;
-	
-	public void stats() throws Exception{
+
+	public void stats() throws Exception {
 		final Object onUploadScoreMutex = new Object();
 		final Object onLeaderboardScoresDownloadedMutex = new Object();
 		final Object onFindLeaderboardMutex = new Object();
-		
-		ISteamUserStatsListener statsListener = new ISteamUserStatsListener() {
-			public void OnUploadScore(LeaderboardScoreUploaded_t pScoreUploadedResult, boolean bIOFailure) {
+
+		final ISteamUserStatsListener statsListener = new ISteamUserStatsListener() {
+			@Override
+			public void OnUploadScore(final LeaderboardScoreUploaded_t pScoreUploadedResult, final boolean bIOFailure) {
 				ioFailure = bIOFailure;
 				scoreUpload = pScoreUploadedResult;
-				synchronized(onUploadScoreMutex){
+				synchronized (onUploadScoreMutex) {
 					onUploadScoreMutex.notifyAll();
 				}
 			}
-			
-			public void OnLeaderboardScoresDownloaded(LeaderboardScoresDownloaded_t pParam, boolean ioFailure) {
+
+			@Override
+			public void OnLeaderboardScoresDownloaded(final LeaderboardScoresDownloaded_t pParam, final boolean ioFailure) {
 				TestUserStats.this.ioFailure = ioFailure;
 				scoreDownload = pParam;
-				synchronized(onLeaderboardScoresDownloadedMutex){
+				synchronized (onLeaderboardScoresDownloadedMutex) {
 					onLeaderboardScoresDownloadedMutex.notifyAll();
 				}
 			}
-			
-			public void OnFindLeaderboard(LeaderboardFindResult_t pFindLeaderboardResult, boolean bIOFailure) {
+
+			@Override
+			public void OnFindLeaderboard(final LeaderboardFindResult_t pFindLeaderboardResult, final boolean bIOFailure) {
 				TestUserStats.this.ioFailure = bIOFailure;
 				foundLeaderboard = pFindLeaderboardResult;
 				synchronized (onFindLeaderboardMutex) {
@@ -73,41 +82,44 @@ public class TestUserStats extends TestCase {
 			}
 		};
 		ISteamUserStats.addListener(statsListener);
-		
+
 		/*
 		 * ************* Find a leaderboard by name **********************
 		 */
 		ISteamUserStats.FindLeaderboard("Quickest Win");
-		synchronized(onFindLeaderboardMutex){
+		synchronized (onFindLeaderboardMutex) {
 			onFindLeaderboardMutex.wait(3000);
 		}
-		if(foundLeaderboard == null){
+		if (foundLeaderboard == null) {
 			throw new Exception("Couldnt find leader board...");
 		}
 		System.out.println("Found leaderboard getM_bLeaderboardFound = " + foundLeaderboard.getM_bLeaderboardFound());
 		System.out.println("Found leaderboard getM_hSteamLeaderboard = " + foundLeaderboard.getM_hSteamLeaderboard());
-		
+
 		/*
 		 * find leaderboard using instanced listener api
 		 */
-		SteamUserStatsListener listener = new SteamUserStatsListener() {
-			public void onUploadScore(LeaderboardScoreUploaded_t pScoreUploadedResult, boolean bIOFailure) {
+		final SteamUserStatsListener listener = new SteamUserStatsListener() {
+			@Override
+			public void onUploadScore(final LeaderboardScoreUploaded_t pScoreUploadedResult, final boolean bIOFailure) {
 				ioFailure = bIOFailure;
 				scoreUpload = pScoreUploadedResult;
-				synchronized(onUploadScoreMutex){
+				synchronized (onUploadScoreMutex) {
 					onUploadScoreMutex.notifyAll();
 				}
 			}
-			
-			public void onLeaderboardScoresDownloaded(LeaderboardScoresDownloaded_t pParam, boolean ioFailure) {
+
+			@Override
+			public void onLeaderboardScoresDownloaded(final LeaderboardScoresDownloaded_t pParam, final boolean ioFailure) {
 				TestUserStats.this.ioFailure = ioFailure;
 				scoreDownload = pParam;
-				synchronized(onLeaderboardScoresDownloadedMutex){
+				synchronized (onLeaderboardScoresDownloadedMutex) {
 					onLeaderboardScoresDownloadedMutex.notifyAll();
 				}
 			}
-			
-			public void onFindLeaderboard(LeaderboardFindResult_t pFindLeaderboardResult, boolean bIOFailure) {
+
+			@Override
+			public void onFindLeaderboard(final LeaderboardFindResult_t pFindLeaderboardResult, final boolean bIOFailure) {
 				TestUserStats.this.ioFailure = bIOFailure;
 				foundLeaderboard = pFindLeaderboardResult;
 				synchronized (onFindLeaderboardMutex) {
@@ -116,35 +128,35 @@ public class TestUserStats extends TestCase {
 			}
 		};
 		ISteamUserStats.FindLeaderboard("Quickest Win", listener);
-		synchronized(onFindLeaderboardMutex){
+		synchronized (onFindLeaderboardMutex) {
 			onFindLeaderboardMutex.wait(3000);
 		}
-		if(foundLeaderboard == null){
+		if (foundLeaderboard == null) {
 			throw new Exception("Couldnt find leader board...");
 		}
 		System.out.println("============= Found Leaderboard listener api ========================");
 		System.out.println("Found leaderboard getM_bLeaderboardFound = " + foundLeaderboard.getM_bLeaderboardFound());
 		System.out.println("Found leaderboard getM_hSteamLeaderboard = " + foundLeaderboard.getM_hSteamLeaderboard());
-		
+
 		/*
 		 * ************* Download top 10 entries for a leaderboard **********************
 		 */
 		ISteamUserStats.DownloadLeaderboardEntries(foundLeaderboard.getM_hSteamLeaderboard(), ELeaderboardDataRequest.k_ELeaderboardDataRequestGlobal, 0, 10);
-		synchronized(onLeaderboardScoresDownloadedMutex){
+		synchronized (onLeaderboardScoresDownloadedMutex) {
 			onLeaderboardScoresDownloadedMutex.wait(3000);
 		}
-		if(scoreDownload == null){
+		if (scoreDownload == null) {
 			throw new Exception("Couldn't download leaderboard entries...");
 		}
 		System.out.println("Scores downloaded scoreDownload.getM_cEntryCount() = " + scoreDownload.getM_cEntryCount());
 		System.out.println("Scores downloaded getM_hSteamLeaderboard() = " + scoreDownload.getM_hSteamLeaderboard());
 		System.out.println("Scores downloaded getM_hSteamLeaderboardEntries() = " + scoreDownload.getM_hSteamLeaderboardEntries());
-		
+
 		System.out.println("Leaderboard entries:");
-		for(int i = 0; i < scoreDownload.getM_cEntryCount(); i++){
-			LeaderboardEntry_t entry = new LeaderboardEntry_t();
-			IntBuffer pDetails = ByteBuffer.allocateDirect(3 * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
-			boolean gotEntry = ISteamUserStats.GetDownloadedLeaderboardEntry(scoreDownload.getM_hSteamLeaderboardEntries(), i, entry, pDetails);
+		for (int i = 0; i < scoreDownload.getM_cEntryCount(); i++) {
+			final LeaderboardEntry_t entry = new LeaderboardEntry_t();
+			final IntBuffer pDetails = ByteBuffer.allocateDirect(3 * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
+			final boolean gotEntry = ISteamUserStats.GetDownloadedLeaderboardEntry(scoreDownload.getM_hSteamLeaderboardEntries(), i, entry, pDetails);
 			System.out.println("gotEntry = " + gotEntry);
 			System.out.println("entry.getM_cDetails() = " + entry.getM_cDetails());
 			System.out.println("entry.getM_hUGC() = " + entry.getM_hUGC());
@@ -154,21 +166,22 @@ public class TestUserStats extends TestCase {
 			System.out.println("Persona name = " + ISteamFriends.GetFriendPersonaName(entry.getM_steamIDUser()));
 			System.out.println();
 		}
-		
+
 		/*
 		 * ************* Submit a new score **********************
 		 */
-		Random rand = new Random();
+		final Random rand = new Random();
 		IntBuffer scoreData = ByteBuffer.allocateDirect(300 * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
-		while(scoreData.remaining() > 0){
+		while (scoreData.remaining() > 0) {
 			scoreData.put(rand.nextInt());
 		}
 		scoreData.clear();
-		ISteamUserStats.UploadLeaderboardScore(foundLeaderboard.getM_hSteamLeaderboard(), ELeaderboardUploadScoreMethod.k_ELeaderboardUploadScoreMethodForceUpdate, Integer.MAX_VALUE, scoreData);
-		synchronized(onUploadScoreMutex){
+		ISteamUserStats.UploadLeaderboardScore(foundLeaderboard.getM_hSteamLeaderboard(),
+				ELeaderboardUploadScoreMethod.k_ELeaderboardUploadScoreMethodForceUpdate, Integer.MAX_VALUE, scoreData);
+		synchronized (onUploadScoreMutex) {
 			onUploadScoreMutex.wait(3000);
 		}
-		if(scoreUpload == null){
+		if (scoreUpload == null) {
 			throw new Exception("Failed to upload score...");
 		}
 		System.out.println("scoreUpload.getM_bScoreChanged() = " + scoreUpload.getM_bScoreChanged());
@@ -177,27 +190,27 @@ public class TestUserStats extends TestCase {
 		System.out.println("scoreUpload.getM_nGlobalRankNew() = " + scoreUpload.getM_nGlobalRankNew());
 		System.out.println("scoreUpload.getM_nGlobalRankPrevious() = " + scoreUpload.getM_nGlobalRankPrevious());
 		System.out.println("scoreUpload.getM_nScore()= " + scoreUpload.getM_nScore());
-		
+
 		/*
 		 * ************* get score and data for this user *******************
 		 */
 		scoreDownload = null;
 		ISteamUserStats.DownloadLeaderboardEntriesForUsers(foundLeaderboard.getM_hSteamLeaderboard(), ISteamUser.GetSteamID(), 1);
-		synchronized(onLeaderboardScoresDownloadedMutex){
+		synchronized (onLeaderboardScoresDownloadedMutex) {
 			onLeaderboardScoresDownloadedMutex.wait(3000);
 		}
-		if(scoreDownload == null){
+		if (scoreDownload == null) {
 			throw new Exception("Couldn't get score for this user");
 		}
 		System.out.println("Scores downloaded scoreDownload.getM_cEntryCount() = " + scoreDownload.getM_cEntryCount());
 		System.out.println("Scores downloaded getM_hSteamLeaderboard() = " + scoreDownload.getM_hSteamLeaderboard());
 		System.out.println("Scores downloaded getM_hSteamLeaderboardEntries() = " + scoreDownload.getM_hSteamLeaderboardEntries());
-		
+
 		System.out.println("Leaderboard entries:");
-		for(int i = 0; i < scoreDownload.getM_cEntryCount(); i++){
-			LeaderboardEntry_t entry = new LeaderboardEntry_t();
-			IntBuffer pDetails = ByteBuffer.allocateDirect(3 * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
-			boolean gotEntry = ISteamUserStats.GetDownloadedLeaderboardEntry(scoreDownload.getM_hSteamLeaderboardEntries(), i, entry, pDetails);
+		for (int i = 0; i < scoreDownload.getM_cEntryCount(); i++) {
+			final LeaderboardEntry_t entry = new LeaderboardEntry_t();
+			final IntBuffer pDetails = ByteBuffer.allocateDirect(3 * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
+			final boolean gotEntry = ISteamUserStats.GetDownloadedLeaderboardEntry(scoreDownload.getM_hSteamLeaderboardEntries(), i, entry, pDetails);
 			System.out.println("gotEntry = " + gotEntry);
 			System.out.println("entry.getM_cDetails() = " + entry.getM_cDetails());
 			System.out.println("entry.getM_hUGC() = " + entry.getM_hUGC());
@@ -207,7 +220,7 @@ public class TestUserStats extends TestCase {
 			System.out.println("Persona name = " + ISteamFriends.GetFriendPersonaName(entry.getM_steamIDUser()));
 			System.out.println();
 		}
-		
+
 		/*
 		 * ************* create a new nimbly games leaderboard *******************
 		 */
@@ -216,37 +229,39 @@ public class TestUserStats extends TestCase {
 		System.out.println("================= =================");
 		System.out.println("================= =================");
 		foundLeaderboard = null;
-		ISteamUserStats.FindOrCreateLeaderboard("NimblyGamesLLC", ELeaderboardSortMethod.k_ELeaderboardSortMethodDescending, ELeaderboardDisplayType.k_ELeaderboardDisplayTypeNumeric, listener);
-		synchronized(onFindLeaderboardMutex){
+		ISteamUserStats.FindOrCreateLeaderboard("NimblyGamesLLC", ELeaderboardSortMethod.k_ELeaderboardSortMethodDescending,
+				ELeaderboardDisplayType.k_ELeaderboardDisplayTypeNumeric, listener);
+		synchronized (onFindLeaderboardMutex) {
 			onFindLeaderboardMutex.wait(3000);
 		}
-		if(foundLeaderboard == null){
+		if (foundLeaderboard == null) {
 			throw new Exception("Couldnt find custom leaderboard NimblyGamesLLC");
 		}
 		System.out.println("Found leaderboard getM_bLeaderboardFound = " + foundLeaderboard.getM_bLeaderboardFound());
 		System.out.println("Found leaderboard getM_hSteamLeaderboard = " + foundLeaderboard.getM_hSteamLeaderboard());
 		System.out.println("Leaderboard name = " + ISteamUserStats.GetLeaderboardName(foundLeaderboard.getM_hSteamLeaderboard()));
-		
+
 		/*
 		 * ************* Download top 10 entries for custom nimbly games leaderboard **********************
 		 */
 		scoreDownload = null;
-		ISteamUserStats.DownloadLeaderboardEntries(foundLeaderboard.getM_hSteamLeaderboard(), ELeaderboardDataRequest.k_ELeaderboardDataRequestGlobal, 0, 10, listener);
-		synchronized(onLeaderboardScoresDownloadedMutex){
+		ISteamUserStats.DownloadLeaderboardEntries(foundLeaderboard.getM_hSteamLeaderboard(), ELeaderboardDataRequest.k_ELeaderboardDataRequestGlobal, 0, 10,
+				listener);
+		synchronized (onLeaderboardScoresDownloadedMutex) {
 			onLeaderboardScoresDownloadedMutex.wait(3000);
 		}
-		if(scoreDownload == null){
+		if (scoreDownload == null) {
 			throw new Exception("Couldn't download leaderboard entries...");
 		}
 		System.out.println("Scores downloaded scoreDownload.getM_cEntryCount() = " + scoreDownload.getM_cEntryCount());
 		System.out.println("Scores downloaded getM_hSteamLeaderboard() = " + scoreDownload.getM_hSteamLeaderboard());
 		System.out.println("Scores downloaded getM_hSteamLeaderboardEntries() = " + scoreDownload.getM_hSteamLeaderboardEntries());
-		
+
 		System.out.println("Leaderboard entries:");
-		for(int i = 0; i < scoreDownload.getM_cEntryCount(); i++){
-			LeaderboardEntry_t entry = new LeaderboardEntry_t();
-			IntBuffer pDetails = ByteBuffer.allocateDirect(3 * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
-			boolean gotEntry = ISteamUserStats.GetDownloadedLeaderboardEntry(scoreDownload.getM_hSteamLeaderboardEntries(), i, entry, pDetails);
+		for (int i = 0; i < scoreDownload.getM_cEntryCount(); i++) {
+			final LeaderboardEntry_t entry = new LeaderboardEntry_t();
+			final IntBuffer pDetails = ByteBuffer.allocateDirect(3 * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
+			final boolean gotEntry = ISteamUserStats.GetDownloadedLeaderboardEntry(scoreDownload.getM_hSteamLeaderboardEntries(), i, entry, pDetails);
 			System.out.println("gotEntry = " + gotEntry);
 			System.out.println("entry.getM_cDetails() = " + entry.getM_cDetails());
 			System.out.println("entry.getM_hUGC() = " + entry.getM_hUGC());
@@ -256,20 +271,21 @@ public class TestUserStats extends TestCase {
 			System.out.println("Persona name = " + ISteamFriends.GetFriendPersonaName(entry.getM_steamIDUser()));
 			System.out.println();
 		}
-		
+
 		/*
 		 * ************* Submit a new score for custom leaderboard **********************
 		 */
 		scoreData = ByteBuffer.allocateDirect(300 * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
-		while(scoreData.remaining() > 0){
+		while (scoreData.remaining() > 0) {
 			scoreData.put(rand.nextInt());
 		}
 		scoreData.clear();
-		ISteamUserStats.UploadLeaderboardScore(foundLeaderboard.getM_hSteamLeaderboard(), ELeaderboardUploadScoreMethod.k_ELeaderboardUploadScoreMethodForceUpdate, 1, scoreData, listener);
-		synchronized(onUploadScoreMutex){
+		ISteamUserStats.UploadLeaderboardScore(foundLeaderboard.getM_hSteamLeaderboard(),
+				ELeaderboardUploadScoreMethod.k_ELeaderboardUploadScoreMethodForceUpdate, 1, scoreData, listener);
+		synchronized (onUploadScoreMutex) {
 			onUploadScoreMutex.wait(3000);
 		}
-		if(scoreUpload == null){
+		if (scoreUpload == null) {
 			throw new Exception("Failed to upload score...");
 		}
 		System.out.println("scoreUpload.getM_bScoreChanged() = " + scoreUpload.getM_bScoreChanged());
@@ -278,27 +294,27 @@ public class TestUserStats extends TestCase {
 		System.out.println("scoreUpload.getM_nGlobalRankNew() = " + scoreUpload.getM_nGlobalRankNew());
 		System.out.println("scoreUpload.getM_nGlobalRankPrevious() = " + scoreUpload.getM_nGlobalRankPrevious());
 		System.out.println("scoreUpload.getM_nScore()= " + scoreUpload.getM_nScore());
-		
+
 		/*
 		 * ************* get score and data for this user on custom nimblygames leaderboard *******************
 		 */
 		scoreDownload = null;
 		ISteamUserStats.DownloadLeaderboardEntriesForUsers(foundLeaderboard.getM_hSteamLeaderboard(), ISteamUser.GetSteamID(), 1, listener);
-		synchronized(onLeaderboardScoresDownloadedMutex){
+		synchronized (onLeaderboardScoresDownloadedMutex) {
 			onLeaderboardScoresDownloadedMutex.wait(3000);
 		}
-		if(scoreDownload == null){
+		if (scoreDownload == null) {
 			throw new Exception("Couldn't get score for this user");
 		}
 		System.out.println("Scores downloaded scoreDownload.getM_cEntryCount() = " + scoreDownload.getM_cEntryCount());
 		System.out.println("Scores downloaded getM_hSteamLeaderboard() = " + scoreDownload.getM_hSteamLeaderboard());
 		System.out.println("Scores downloaded getM_hSteamLeaderboardEntries() = " + scoreDownload.getM_hSteamLeaderboardEntries());
-		
+
 		System.out.println("Leaderboard entries:");
-		for(int i = 0; i < scoreDownload.getM_cEntryCount(); i++){
-			LeaderboardEntry_t entry = new LeaderboardEntry_t();
-			IntBuffer pDetails = ByteBuffer.allocateDirect(3 * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
-			boolean gotEntry = ISteamUserStats.GetDownloadedLeaderboardEntry(scoreDownload.getM_hSteamLeaderboardEntries(), i, entry, pDetails);
+		for (int i = 0; i < scoreDownload.getM_cEntryCount(); i++) {
+			final LeaderboardEntry_t entry = new LeaderboardEntry_t();
+			final IntBuffer pDetails = ByteBuffer.allocateDirect(3 * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
+			final boolean gotEntry = ISteamUserStats.GetDownloadedLeaderboardEntry(scoreDownload.getM_hSteamLeaderboardEntries(), i, entry, pDetails);
 			System.out.println("gotEntry = " + gotEntry);
 			System.out.println("entry.getM_cDetails() = " + entry.getM_cDetails());
 			System.out.println("entry.getM_hUGC() = " + entry.getM_hUGC());
@@ -309,17 +325,15 @@ public class TestUserStats extends TestCase {
 			System.out.println();
 		}
 	}
-	
+
 	private static Thread startRunCallbackThread() {
-		Thread thread = new Thread(new Runnable() {
-			public void run() {
-				while (true) {
-					steam_api.SteamAPI_RunCallbacks();
-					try {
-						Thread.sleep(50);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+		final Thread thread = new Thread(() -> {
+			while (true) {
+				steam_api.SteamAPI_RunCallbacks();
+				try {
+					Thread.sleep(50);
+				} catch (final InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
 		});

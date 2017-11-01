@@ -1,18 +1,24 @@
 package steam;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ISteamUserStats {
 	private static final String UTF_8_CHARSET = "UTF-8";
 
+	private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
 	private static ByteBuffer tempBuffer = ByteBuffer.allocateDirect(200).order(ByteOrder.nativeOrder());
 
-	private static final ArrayList<ISteamUserStatsListener> listeners = new ArrayList<ISteamUserStatsListener>();
-	private static final ArrayList<ISteamUserStatsListener> listenersTemp = new ArrayList<ISteamUserStatsListener>();
+	private static final ArrayList<ISteamUserStatsListener> listeners = new ArrayList<>();
+	private static final ArrayList<ISteamUserStatsListener> listenersTemp = new ArrayList<>();
 
 	public static boolean RequestCurrentStats() {
 		return nRequestCurrentStats();
@@ -26,13 +32,13 @@ public class ISteamUserStats {
 
 	private static native boolean nStoreStats();
 
-	public static boolean GetAchievement(String pchName) {
+	public static boolean GetAchievement(final String pchName) {
 		tempBuffer.position(0);
 		tempBuffer.limit(tempBuffer.capacity());
 		try {
 			tempBuffer.put(pchName.getBytes(UTF_8_CHARSET));
-		} catch (UnsupportedEncodingException e) {
-			steam_api.getLogger().error(e.getMessage(), e);
+		} catch (final UnsupportedEncodingException e) {
+			LOG.error(e.getMessage(), e);
 			return false;
 		}
 		tempBuffer.put((byte) 0);
@@ -42,13 +48,13 @@ public class ISteamUserStats {
 
 	private static native boolean nGetAchievement(ByteBuffer tempBuffer);
 
-	public static boolean SetAchievement(String pchName) {
+	public static boolean SetAchievement(final String pchName) {
 		tempBuffer.position(0);
 		tempBuffer.limit(tempBuffer.capacity());
 		try {
 			tempBuffer.put(pchName.getBytes(UTF_8_CHARSET));
-		} catch (UnsupportedEncodingException e) {
-			steam_api.getLogger().error(e.getMessage(), e);
+		} catch (final UnsupportedEncodingException e) {
+			LOG.error(e.getMessage(), e);
 			return false;
 		}
 		tempBuffer.put((byte) 0);
@@ -58,13 +64,13 @@ public class ISteamUserStats {
 
 	private static native boolean nSetAchievement(ByteBuffer tempBuffer);
 
-	public static boolean ClearAchievement(String pchName) {
+	public static boolean ClearAchievement(final String pchName) {
 		tempBuffer.position(0);
 		tempBuffer.limit(tempBuffer.capacity());
 		try {
 			tempBuffer.put(pchName.getBytes(UTF_8_CHARSET));
-		} catch (UnsupportedEncodingException e) {
-			steam_api.getLogger().error(e.getMessage(), e);
+		} catch (final UnsupportedEncodingException e) {
+			LOG.error(e.getMessage(), e);
 			return false;
 		}
 		tempBuffer.put((byte) 0);
@@ -74,20 +80,20 @@ public class ISteamUserStats {
 
 	private static native boolean nClearAchievement(ByteBuffer tempBuffer);
 
-	public static void FindLeaderboard(String pchLeaderboardName) {
+	public static void FindLeaderboard(final String pchLeaderboardName) {
 		nFindLeaderboard(pchLeaderboardName);
 	}
 
 	private static native void nFindLeaderboard(String pchLeaderboardName);
 
-	public static void FindOrCreateLeaderboard(String pchLeaderboardName, ELeaderboardSortMethod eLeaderboardSortMethod,
-			ELeaderboardDisplayType eLeaderboardDisplayType) {
+	public static void FindOrCreateLeaderboard(final String pchLeaderboardName, final ELeaderboardSortMethod eLeaderboardSortMethod,
+			final ELeaderboardDisplayType eLeaderboardDisplayType) {
 		nFindOrCreateLeaderboard(pchLeaderboardName, eLeaderboardSortMethod.toInt(), eLeaderboardDisplayType.toInt());
 	}
 
 	private static native void nFindOrCreateLeaderboard(String pchLeaderboardName, int eLeaderboardSortMethod, int eLeaderboardDisplayType);
 
-	public static String GetLeaderboardName(SteamLeaderboard_t hSteamLeaderboard) {
+	public static String GetLeaderboardName(final SteamLeaderboard_t hSteamLeaderboard) {
 		return nGetLeaderboardName(hSteamLeaderboard.steamLeaderboard_t);
 	}
 
@@ -99,26 +105,26 @@ public class ISteamUserStats {
 	 * @param hSteamLeaderboard
 	 * @return
 	 */
-	public static int GetLeaderboardEntryCount(SteamLeaderboard_t hSteamLeaderboard) {
+	public static int GetLeaderboardEntryCount(final SteamLeaderboard_t hSteamLeaderboard) {
 		return nGetLeaderboardEntryCount(hSteamLeaderboard.steamLeaderboard_t);
 	}
 
 	public static native int nGetLeaderboardEntryCount(long hSteamLeaderboard);
 
-	public static ELeaderboardSortMethod GetLeaderboardSortMethod(SteamLeaderboard_t hSteamLeaderboard) {
+	public static ELeaderboardSortMethod GetLeaderboardSortMethod(final SteamLeaderboard_t hSteamLeaderboard) {
 		return ELeaderboardSortMethod.fromInt(nGetLeaderboardSortMethod(hSteamLeaderboard.steamLeaderboard_t));
 	}
 
 	private static native int nGetLeaderboardSortMethod(long hSteamLeaderboard);
 
-	public static ELeaderboardDisplayType GetLeaderboardDisplayType(SteamLeaderboard_t hSteamLeaderboard) {
+	public static ELeaderboardDisplayType GetLeaderboardDisplayType(final SteamLeaderboard_t hSteamLeaderboard) {
 		return ELeaderboardDisplayType.fromInt(nGetLeaderboardDisplayType(hSteamLeaderboard.steamLeaderboard_t));
 	}
 
 	private static native int nGetLeaderboardDisplayType(long hSteamLeaderboard);
 
-	public static void DownloadLeaderboardEntries(SteamLeaderboard_t hSteamLeaderboard, ELeaderboardDataRequest eLeaderboardDataRequest, int nRangeStart,
-			int nRangeEnd) {
+	public static void DownloadLeaderboardEntries(final SteamLeaderboard_t hSteamLeaderboard, final ELeaderboardDataRequest eLeaderboardDataRequest,
+			final int nRangeStart, final int nRangeEnd) {
 		nDownloadLeaderboardEntries(hSteamLeaderboard.steamLeaderboard_t, eLeaderboardDataRequest.toInt(), nRangeStart, nRangeEnd);
 	}
 
@@ -132,7 +138,7 @@ public class ISteamUserStats {
 	 * @param prgUsers
 	 * @param cUsers
 	 */
-	public static void DownloadLeaderboardEntriesForUsers(SteamLeaderboard_t hSteamLeaderboard, CSteamID prgUsers, int cUsers) {
+	public static void DownloadLeaderboardEntriesForUsers(final SteamLeaderboard_t hSteamLeaderboard, final CSteamID prgUsers, final int cUsers) {
 		nDownloadLeaderboardEntriesForUsers(hSteamLeaderboard.steamLeaderboard_t, prgUsers.uint64, cUsers);
 	}
 
@@ -150,8 +156,8 @@ public class ISteamUserStats {
 	 * @param index
 	 * @return
 	 */
-	public static boolean GetDownloadedLeaderboardEntry(SteamLeaderboardEntries_t hSteamLeaderboardEntries, int index, LeaderboardEntry_t pLeaderboardEntry,
-			IntBuffer pDetails) {
+	public static boolean GetDownloadedLeaderboardEntry(final SteamLeaderboardEntries_t hSteamLeaderboardEntries, final int index,
+			final LeaderboardEntry_t pLeaderboardEntry, final IntBuffer pDetails) {
 		if (!pDetails.isDirect() && pDetails.order() != ByteOrder.nativeOrder()) {
 			throw new IllegalArgumentException("pScoreDetails must be a direct native order buffer");
 		}
@@ -161,8 +167,8 @@ public class ISteamUserStats {
 	private static native boolean nGetDownloadedLeaderboardEntry(long hSteamLeaderboardEntries, int index, LeaderboardEntry_t pLeaderboardEntry,
 			IntBuffer pDetails);
 
-	public static void UploadLeaderboardScore(SteamLeaderboard_t hSteamLeaderboard, ELeaderboardUploadScoreMethod eLeaderboardUploadScoreMethod, int nScore,
-			IntBuffer pScoreDetails) {
+	public static void UploadLeaderboardScore(final SteamLeaderboard_t hSteamLeaderboard, final ELeaderboardUploadScoreMethod eLeaderboardUploadScoreMethod,
+			final int nScore, final IntBuffer pScoreDetails) {
 		if (!pScoreDetails.isDirect() && pScoreDetails.order() != ByteOrder.nativeOrder()) {
 			throw new IllegalArgumentException("pScoreDetails must be a direct native order buffer");
 		}
@@ -171,16 +177,16 @@ public class ISteamUserStats {
 
 	private static native void nUploadLeaderboardScore(long hSteamLeaderboard, int eLeaderboardUploadScoreMethod, int nScore, IntBuffer pScoreDetails);
 
-	public static void addListener(ISteamUserStatsListener newListener) {
+	public static void addListener(final ISteamUserStatsListener newListener) {
 		removeListener(newListener);
 		listeners.add(newListener);
 	}
 
-	public static void removeListener(ISteamUserStatsListener oldListener) {
+	public static void removeListener(final ISteamUserStatsListener oldListener) {
 		listeners.remove(oldListener);
 	}
 
-	public static void OnLeaderboardScoresDownloaded(LeaderboardScoresDownloaded_t pParam, boolean ioFailure) {
+	public static void OnLeaderboardScoresDownloaded(final LeaderboardScoresDownloaded_t pParam, final boolean ioFailure) {
 		listenersTemp.clear();
 		listenersTemp.addAll(listeners);
 		for (int i = 0; i < listenersTemp.size(); i++) {
@@ -188,7 +194,7 @@ public class ISteamUserStats {
 		}
 	}
 
-	public static void OnFindLeaderboard(LeaderboardFindResult_t pFindLeaderboardResult, boolean bIOFailure) {
+	public static void OnFindLeaderboard(final LeaderboardFindResult_t pFindLeaderboardResult, final boolean bIOFailure) {
 		listenersTemp.clear();
 		listenersTemp.addAll(listeners);
 		for (int i = 0; i < listenersTemp.size(); i++) {
@@ -196,7 +202,7 @@ public class ISteamUserStats {
 		}
 	}
 
-	public static void OnUploadScore(LeaderboardScoreUploaded_t pScoreUploadedResult, boolean bIOFailure) {
+	public static void OnUploadScore(final LeaderboardScoreUploaded_t pScoreUploadedResult, final boolean bIOFailure) {
 		listenersTemp.clear();
 		listenersTemp.addAll(listeners);
 		for (int i = 0; i < listenersTemp.size(); i++) {
@@ -210,7 +216,7 @@ public class ISteamUserStats {
 	 * methods that take a listener
 	 * =========================
 	 */
-	public static void FindLeaderboard(String pchLeaderboardName, SteamUserStatsListener listener) {
+	public static void FindLeaderboard(final String pchLeaderboardName, final SteamUserStatsListener listener) {
 		if (listener.getCppCallbackInstance() == 0) {
 			throw new RuntimeException("SteamUserStatsListener was destroyed");
 		}
@@ -219,8 +225,8 @@ public class ISteamUserStats {
 
 	private static native void nFindLeaderboardListener(String pchLeaderboardName, long listener);
 
-	public static void FindOrCreateLeaderboard(String pchLeaderboardName, ELeaderboardSortMethod eLeaderboardSortMethod,
-			ELeaderboardDisplayType eLeaderboardDisplayType, SteamUserStatsListener listener) {
+	public static void FindOrCreateLeaderboard(final String pchLeaderboardName, final ELeaderboardSortMethod eLeaderboardSortMethod,
+			final ELeaderboardDisplayType eLeaderboardDisplayType, final SteamUserStatsListener listener) {
 		if (listener.getCppCallbackInstance() == 0) {
 			throw new RuntimeException("SteamUserStatsListener was destroyed");
 		}
@@ -231,8 +237,8 @@ public class ISteamUserStats {
 	private static native void nFindOrCreateLeaderboardListener(String pchLeaderboardName, int eLeaderboardSortMethod, int eLeaderboardDisplayType,
 			long listener);
 
-	public static void DownloadLeaderboardEntries(SteamLeaderboard_t hSteamLeaderboard, ELeaderboardDataRequest eLeaderboardDataRequest, int nRangeStart,
-			int nRangeEnd, SteamUserStatsListener listener) {
+	public static void DownloadLeaderboardEntries(final SteamLeaderboard_t hSteamLeaderboard, final ELeaderboardDataRequest eLeaderboardDataRequest,
+			final int nRangeStart, final int nRangeEnd, final SteamUserStatsListener listener) {
 		if (listener.getCppCallbackInstance() == 0) {
 			throw new RuntimeException("SteamUserStatsListener was destroyed");
 		}
@@ -251,8 +257,8 @@ public class ISteamUserStats {
 	 * @param prgUsers
 	 * @param cUsers
 	 */
-	public static void DownloadLeaderboardEntriesForUsers(SteamLeaderboard_t hSteamLeaderboard, CSteamID prgUsers, int cUsers,
-			SteamUserStatsListener listener) {
+	public static void DownloadLeaderboardEntriesForUsers(final SteamLeaderboard_t hSteamLeaderboard, final CSteamID prgUsers, final int cUsers,
+			final SteamUserStatsListener listener) {
 		if (listener.getCppCallbackInstance() == 0) {
 			throw new RuntimeException("SteamUserStatsListener was destroyed");
 		}
@@ -261,8 +267,8 @@ public class ISteamUserStats {
 
 	private static native void nDownloadLeaderboardEntriesForUsersListener(long hSteamLeaderboard, long prgUsers, int cUsers, long listener);
 
-	public static void UploadLeaderboardScore(SteamLeaderboard_t hSteamLeaderboard, ELeaderboardUploadScoreMethod eLeaderboardUploadScoreMethod, int nScore,
-			IntBuffer pScoreDetails, SteamUserStatsListener listener) {
+	public static void UploadLeaderboardScore(final SteamLeaderboard_t hSteamLeaderboard, final ELeaderboardUploadScoreMethod eLeaderboardUploadScoreMethod,
+			final int nScore, final IntBuffer pScoreDetails, final SteamUserStatsListener listener) {
 		if (!pScoreDetails.isDirect() && pScoreDetails.order() != ByteOrder.nativeOrder()) {
 			throw new IllegalArgumentException("pScoreDetails must be a direct native order buffer");
 		}
