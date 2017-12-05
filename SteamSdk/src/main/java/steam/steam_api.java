@@ -25,11 +25,11 @@ public class steam_api {
 		}
 		attemptedToLoadLibraries = true;
 		if (OS_NAME.startsWith("mac")) {
-			System.loadLibrary("steam.jni");
+			System.loadLibrary("steamjni");
 			System.loadLibrary("steam_api");
 		} else {
 			System.loadLibrary("steam_api");
-			System.loadLibrary("steam.jni");
+			System.loadLibrary("steamjni");
 		}
 		LOG.info("Steam library loaded");
 		loadedLibraries = true;
@@ -63,7 +63,7 @@ public class steam_api {
 
 		loadLibrary(steamNativeDir, "steam_api");
 		LOG.info("Steam library api loaded");
-		loadLibrary(steamNativeDir, "steam.jni");
+		loadLibrary(steamNativeDir, "steamjni");
 		LOG.info("Steam library jni loaded");
 
 		loadedLibraries = true;
