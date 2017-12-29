@@ -1,9 +1,13 @@
+import java.nio.ByteBuffer
 import java.nio.file.CopyOption
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import org.gradle.api.internal.artifacts.publish.DefaultPublishArtifact
 import groovy.swing.SwingBuilder
+
+import java.nio.file.StandardOpenOption
 
 apply from: file('../build.gradle')
 apply plugin: 'java'
@@ -19,7 +23,7 @@ buildscript {
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.artifactory'
 
-ext{ steamSdkDirPath = "${projectDir}/sdk/sdk_135" }
+ext { steamSdkDirPath = "${projectDir}/sdk/sdk_135" }
 
 repositories { jcenter() }
 
@@ -55,21 +59,18 @@ publishing {
 task nativeHeaders {
 	def outputDirectory = file("src/steamjni/cpp")
 	def classes = [
-		'steam.steam_api',
-		'steam.ISteamUserStats',
-		'steam.ISteamFriends',
-		'steam.ISteamUser',
-		'steam.ISteamUtils',
-		'steam.steam_gameserver',
-		'steam.ISteamGameServer',
-		'steam.ISteamRemoteStorage',
-		'steam.SteamUserStatsListener',
-		'steam.ISteamController',
-		'steam.ISteamApps'
+			'steam.steam_api',
+			'steam.ISteamUserStats',
+			'steam.ISteamFriends',
+			'steam.ISteamUser',
+			'steam.ISteamUtils',
+			'steam.steam_gameserver',
+			'steam.ISteamGameServer',
+			'steam.ISteamRemoteStorage',
+			'steam.SteamUserStatsListener',
+			'steam.ISteamController',
+			'steam.ISteamApps'
 	]
-	inputs.files sourceSets.main.output
-	inputs.property('classes', classes)
-	outputs.file outputDirectory
 	doLast {
 		outputDirectory.parentFile.mkdirs()
 		exec {
@@ -78,6 +79,63 @@ task nativeHeaders {
 			args '-classpath', sourceSets.main.output.classesDirs.asPath
 			args classes
 		}
+
+		Files.newDirectoryStream(outputDirectory.toPath()).forEach({
+			path ->
+				if (!path.getFileName().toString().endsWith(".h")) {
+					return;
+				}
+				def inputChannel
+				def outputChannel
+				def foundCr = false
+				def outputFile
+				try {
+					inputChannel = Files.newByteChannel(path, StandardOpenOption.READ);
+					outputFile = new File(path.toFile().getAbsoluteFile().getParentFile(), "${path.getFileName()}lf")
+					outputChannel = Files.newByteChannel(outputFile.toPath(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)
+					foundCr = false;
+
+					def inBuffer = ByteBuffer.allocate(1024)
+					def outBuffer = ByteBuffer.allocate(inBuffer.capacity())
+					while (true) {
+						inBuffer.clear()
+						outBuffer.clear()
+						def bytesRead = inputChannel.read(inBuffer)
+						if (bytesRead < 0) {
+							break;
+						}
+						inBuffer.flip()
+						while (inBuffer.remaining() > 0) {
+							byte b = inBuffer.get()
+							if (b == '\r') {
+								foundCr = true
+							} else {
+								outBuffer.put(b)
+							}
+						}
+						outBuffer.flip()
+						outputChannel.write(outBuffer)
+					}
+				} catch (Throwable throwable) {
+					println("Failed to remove carriage returns from header files")
+					throwable.printStackTrace()
+				} finally {
+					if (inputChannel != null) {
+						inputChannel.close();
+					}
+					if (outputChannel != null) {
+						outputChannel.close();
+					}
+				}
+				if (foundCr) {
+					println("Replaced \\r in path = $path")
+					Files.move(outputFile.toPath(), path, StandardCopyOption.REPLACE_EXISTING)
+				} else {
+					if (Files.exists(outputFile.toPath())) {
+						Files.delete(outputFile.toPath())
+					}
+				}
+		})
 	}
 }
 
@@ -98,8 +156,8 @@ model {
 		}
 	}
 
-	components{
-		steamjni(NativeLibrarySpec){
+	components {
+		steamjni(NativeLibrarySpec) {
 			targetPlatform "x86"
 			targetPlatform "x64"
 
@@ -125,12 +183,12 @@ model {
 					cppCompiler.args "/I${steamSdkDirPath}/public"
 
 					linker.args '/nologo'
-					if(targetPlatform.name== "x86") {
+					if (targetPlatform.name == "x86") {
 						linker.args "/libpath:${steamSdkDirPath}/public/steam/lib/win32"
 						linker.args "/libpath:${steamSdkDirPath}/redistributable_bin"
 						linker.args 'steam_api.lib'
 					}
-					if(targetPlatform.name== "x64") {
+					if (targetPlatform.name == "x64") {
 						linker.args "/libpath:${steamSdkDirPath}/public/steam/lib/win32"
 						linker.args "/libpath:${steamSdkDirPath}/redistributable_bin/win64"
 						linker.args 'steam_api64.lib'
@@ -142,15 +200,15 @@ model {
 	}
 }
 
-task distribute (dependsOn: [
-	'classes',
-	'nativeHeaders',
-	'buildDependentsSteamjniX86SharedLibrary',
-	'buildDependentsSteamjniX64SharedLibrary'
-]){
+task distribute(dependsOn: [
+		'classes',
+		'nativeHeaders',
+		'buildDependentsSteamjniX86SharedLibrary',
+		'buildDependentsSteamjniX64SharedLibrary'
+]) {
 	description = "Copy all dll's to the dist folder"
 	group = "Distribution"
-	doLast{
+	doLast {
 		// copy x86 dll
 		def steamjni86Dll = Paths.get("$projectDir/build/libs/steamjni/shared/x86/steamjni.dll")
 		def steamjni86DllDist = Paths.get("$projectDir/dist/steamjni.dll")
@@ -166,7 +224,8 @@ task distribute (dependsOn: [
 }
 
 artifactory {
-	contextUrl = 'https://artifactory.nimblygames.com/artifactory'   //The base Artifactory URL if not overridden by the publisher/resolver
+	contextUrl = 'https://artifactory.nimblygames.com/artifactory'
+	//The base Artifactory URL if not overridden by the publisher/resolver
 	publish {
 		//		defaults {
 		//			publications ('mavenJava')
@@ -198,27 +257,27 @@ artifactoryPublish {
 	skip = false //Skip build info analysis and publishing (false by default)
 	properties { steamjnix86Publish '**:**:**:*@*', platform: 'win32' }
 	println "username = ${clientConfig.publisher.username}"
-	publications ('steamjnix86Publish', 'steamjnix64Publish')
+	publications('steamjnix86Publish', 'steamjnix64Publish')
 	//	}
 
-	doLast{
+	doLast {
 		clientConfig.publisher.repoKey = 'gradle-release-local'
 		clientConfig.publisher.username = promptUser("username:")
 		clientConfig.publisher.password = promptUser("password:");
 	}
 }
 
-def promptUser (prompt) {
+def promptUser(prompt) {
 	def pass = ''
-	if(System.console() == null) {
+	if (System.console() == null) {
 		new SwingBuilder().edt {
 			dialog(modal: true, // Otherwise the build will continue running before you closed the dialog
-			title: prompt, // Dialog title
-			alwaysOnTop: true, // pretty much what the name says
-			resizable: false, // Don't allow the user to resize the dialog
-			locationRelativeTo: null, // Place dialog in center of the screen
-			pack: true, // We need to pack the dialog (so it will take the size of it's children)
-			show: true // Let's show it
+					title: prompt, // Dialog title
+					alwaysOnTop: true, // pretty much what the name says
+					resizable: false, // Don't allow the user to resize the dialog
+					locationRelativeTo: null, // Place dialog in center of the screen
+					pack: true, // We need to pack the dialog (so it will take the size of it's children)
+					show: true // Let's show it
 			) {
 				vbox {
 					// Put everything below each other
@@ -236,7 +295,7 @@ def promptUser (prompt) {
 		pass = new String(pass)
 	}
 
-	if(pass.size() <= 0) {
+	if (pass.size() <= 0) {
 		throw new InvalidUserDataException("You must enter ${prompt} to proceed.")
 	}
 	return pass;
