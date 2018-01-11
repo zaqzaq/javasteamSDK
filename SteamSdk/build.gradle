@@ -152,7 +152,7 @@ model {
 	toolChains {
 		vc(VisualCpp) {
 			installDir "C:/Program Files (x86)/Microsoft Visual Studio 10.0"
-			windowsSdkDir "C:/Program Files (x86)/Microsoft SDKs/Windows/v7.1A"
+			windowsSdkDir "C:/Program Files/Microsoft SDKs/Windows/v7.1"
 		}
 	}
 
@@ -178,8 +178,8 @@ model {
 					cppCompiler.args '/EHs'
 					cppCompiler.args '/MT'
 					cppCompiler.args '/nologo'
-					cppCompiler.args "/IC:/Program Files (x86)/Java/jdk6/include"
-					cppCompiler.args "/IC:/Program Files (x86)/Java/jdk6/include/win32"
+					cppCompiler.args "/IC:/Program Files/Java/jdk6/include"
+					cppCompiler.args "/IC:/Program Files/Java/jdk6/include/win32"
 					cppCompiler.args "/I${steamSdkDirPath}/public"
 
 					linker.args '/nologo'
