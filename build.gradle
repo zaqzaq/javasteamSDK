@@ -1,6 +1,11 @@
-apply from: project(':core').projectDir.getAbsolutePath() + "/build.gradle"
+//apply from: project(':core').projectDir.getAbsolutePath() + "/build.gradle"
 
 allprojects {
 }
-ext{
+ext {
+	// test
+	junitVersion = '4.12'
+	// logging
+	slf4jVersion = '1.7.25'
+	log4jVersion = '2.8.2'
 }
