@@ -199,9 +199,9 @@ model {
 					cppCompiler.define 'NG_LIN'
 
 					cppCompiler.args '-I'
-					cppCompiler.args '/usr/lib/jvm/java-8-openjdk-i386/include'
+					cppCompiler.args '/usr/lib/jvm/java-8-openjdk-amd64/include/'
 					cppCompiler.args '-I'
-					cppCompiler.args '/usr/lib/jvm/java-8-openjdk-i386/include/linux'
+					cppCompiler.args '/usr/lib/jvm/java-8-openjdk-amd64/include/linux/'
 					cppCompiler.args '-I'
 					cppCompiler.args "${steamSdkDirPath}/public"
 					cppCompiler.args '-fPIC'
