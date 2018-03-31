@@ -148,8 +148,8 @@ model {
 
 	toolChains {
 		vc(VisualCpp) {
-			installDir "C:/Program Files (x86)/Microsoft Visual Studio 10.0"
-			windowsSdkDir "C:/Program Files/Microsoft SDKs/Windows/v7.1"
+			installDir file("C:/Program Files (x86)/Microsoft Visual Studio 10.0")
+			windowsSdkDir file("C:/Program Files/Microsoft SDKs/Windows/v7.1")
 		}
 	}
 
