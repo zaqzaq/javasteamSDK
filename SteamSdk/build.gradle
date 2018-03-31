@@ -151,6 +151,10 @@ model {
 			installDir new File("C:/Program Files (x86)/Microsoft Visual Studio 10.0")
 			windowsSdkDir new File("C:/Program Files/Microsoft SDKs/Windows/v7.1")
 		}
+		gcc(Gcc) {
+			// Uncomment to use a GCC install that is not in the PATH
+			// path "/usr/bin/gcc"
+		}
 	}
 
 	components {
