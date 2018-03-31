@@ -1,12 +1,9 @@
-import java.nio.ByteBuffer
-import java.nio.file.CopyOption
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
-import org.gradle.api.internal.artifacts.publish.DefaultPublishArtifact
 import groovy.swing.SwingBuilder
 
+import java.nio.ByteBuffer
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
 
 apply from: file('../build.gradle')
@@ -194,6 +191,38 @@ model {
 						linker.args 'steam_api64.lib'
 					}
 					linker.args 'User32.lib'
+				} else if (toolChain in Gcc) {
+					cppCompiler.define 'NG_LIN'
+
+					cppCompiler.args '-I'
+					cppCompiler.args '/usr/lib/jvm/java-8-openjdk-i386/include'
+					cppCompiler.args '-I'
+					cppCompiler.args '/usr/lib/jvm/java-8-openjdk-i386/include/linux'
+					cppCompiler.args '-I'
+					cppCompiler.args "${steamSdkDirPath}/public"
+					cppCompiler.args '-fPIC'
+					cppCompiler.args '-c'
+					cppCompiler.args '-fmessage-length=0'
+					cppCompiler.args '-Wwrite-strings'
+					cppCompiler.args '-O2'
+					if (targetPlatform.name == "x86") {
+						cppCompiler.args '-m32'
+					}
+					if (targetPlatform.name == "x64") {
+						cppCompiler.args '-m64'
+					}
+
+					linker.args '-shared'
+					linker.args '-l'
+					linker.args 'steam_api'
+					if (targetPlatform.name == "x86") {
+						linker.args '-L'
+						linker.args "${steamSdkDirPath}/redistributable_bin/linux32"
+					}
+					if (targetPlatform.name == "x64") {
+						linker.args '-L'
+						linker.args "${steamSdkDirPath}/redistributable_bin/linux64"
+					}
 				}
 			}
 		}

@@ -1,0 +1,31 @@
+
+stages:
+  - wake
+  - build
+  - test
+
+wake:
+  stage: wake
+  tags:
+    - ubuntu
+  script:
+    - wakeonlan 10:9A:DD:51:F5:11
+    - sleep 1m
+
+
+build:
+  stage: build
+  script:
+    - ./gradlew assemble
+  artifacts:
+    paths:
+      - build/libs/*.jar
+    expire_in: 1 week
+
+test:
+  stage: test
+  script:
+    - ./gradlew check
+
+after_script:
+  - echo "End CI"
