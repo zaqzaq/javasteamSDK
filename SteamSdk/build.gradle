@@ -235,8 +235,12 @@ model {
 					linker.args 'User32.lib'
 				} else if (toolChain in Gcc) {
 					// compiler define linux
+					println("tool chain is gcc checking if linux")
 					if(targetPlatform.operatingSystem == "linux"){
 						cppCompiler.define 'NG_LIN'
+						println("operating system is linux")
+					}else{
+						println("OPerating system is " + targetPlatform.operatingSystem.getClass())
 					}
 
 					cppCompiler.args '-I'
@@ -254,6 +258,7 @@ model {
 					if (targetPlatform == "linux64") {
 						cppCompiler.args '-m64'
 					}
+					// fixme this isn't returning true on Ubuntu
 					if (targetPlatform.operatingSystem == "linux") {
 						cppCompiler.args '-I'
 						cppCompiler.args '/usr/lib/jvm/java-8-openjdk-amd64/include/'
