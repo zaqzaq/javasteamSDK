@@ -235,12 +235,12 @@ model {
 					linker.args 'User32.lib'
 				} else if (toolChain in Gcc) {
 					// compiler define linux
-					println("tool chain is gcc checking if linux")
-					if(targetPlatform.operatingSystem == "linux"){
+					println("OPerating system is " + targetPlatform.operatingSystem.getClass())
+					println("OPerating system name=" + targetPlatform.operatingSystem.getName())
+					println("OPerating system=" + targetPlatform.operatingSystem)
+					if(targetPlatform.operatingSystem.getName().equalsIgnoreCase("linux")){
 						cppCompiler.define 'NG_LIN'
 						println("operating system is linux")
-					}else{
-						println("OPerating system is " + targetPlatform.operatingSystem.getClass())
 					}
 
 					cppCompiler.args '-I'
