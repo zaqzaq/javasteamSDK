@@ -142,8 +142,31 @@ classes.finalizedBy nativeHeaders
 // C++
 model {
 	platforms {
-		x86 { architecture "x86" }
-		x64 { architecture "x86_64" }
+		// fixme need platform for win, lin, osx 32 and 64... so six platforms?...
+		linux32 {
+			architecture "x86"
+			operatingSystem "linux"
+		}
+		linux64 {
+			architecture "x86_64"
+			operatingSystem "linux"
+		}
+		osx32 {
+			architecture "x86"
+			operatingSystem "osx"
+		}
+		osx64 {
+			architecture "x86_64"
+			operatingSystem "osx"
+		}
+		windows32 {
+			architecture "x86"
+			operatingSystem "windows"
+		}
+		windows64 {
+			architecture "x86_64"
+			operatingSystem "windows"
+		}
 	}
 
 	toolChains {
@@ -154,14 +177,29 @@ model {
 		gcc(Gcc) {
 			// Uncomment to use a GCC install that is not in the PATH
 			// path "/usr/bin/gcc"
+			target("osx32") {
+				eachPlatform { tools ->
+					tools.cppCompiler.executable = "g++4.0"
+					tools.linker.executable = "g++4.0"
+				}
+			}
+			target("osx64") {
+				eachPlatform { tools ->
+					tools.cppCompiler.executable = "g++4.0"
+					tools.linker.executable = "g++4.0"
+				}
+			}
 		}
 	}
 
 	components {
 		steamjni(NativeLibrarySpec) {
-			targetPlatform "x86"
-			targetPlatform "x64"
-
+			targetPlatform "linux32"
+			targetPlatform "linux64"
+			targetPlatform "osx32"
+			targetPlatform "osx64"
+			targetPlatform "windows32"
+			targetPlatform "windows64"
 
 			binaries.withType(StaticLibraryBinarySpec) { buildable = false }
 
@@ -184,12 +222,12 @@ model {
 					cppCompiler.args "/I${steamSdkDirPath}/public"
 
 					linker.args '/nologo'
-					if (targetPlatform.name == "x86") {
+					if (targetPlatform.name == "windows32") {
 						linker.args "/libpath:${steamSdkDirPath}/public/steam/lib/win32"
 						linker.args "/libpath:${steamSdkDirPath}/redistributable_bin"
 						linker.args 'steam_api.lib'
 					}
-					if (targetPlatform.name == "x64") {
+					if (targetPlatform.name == "windows64") {
 						linker.args "/libpath:${steamSdkDirPath}/public/steam/lib/win32"
 						linker.args "/libpath:${steamSdkDirPath}/redistributable_bin/win64"
 						linker.args 'steam_api64.lib'
@@ -199,33 +237,62 @@ model {
 					cppCompiler.define 'NG_LIN'
 
 					cppCompiler.args '-I'
-					cppCompiler.args '/usr/lib/jvm/java-8-openjdk-amd64/include/'
-					cppCompiler.args '-I'
-					cppCompiler.args '/usr/lib/jvm/java-8-openjdk-amd64/include/linux/'
-					cppCompiler.args '-I'
 					cppCompiler.args "${steamSdkDirPath}/public"
 					cppCompiler.args '-fPIC'
 					cppCompiler.args '-c'
 					cppCompiler.args '-fmessage-length=0'
 					cppCompiler.args '-Wwrite-strings'
 					cppCompiler.args '-O2'
-					if (targetPlatform.name == "x86") {
+
+					// compiler linux
+					if (targetPlatform.name == "linux32") {
 						cppCompiler.args '-m32'
 					}
-					if (targetPlatform.name == "x64") {
+					if (targetPlatform.name == "linux64") {
 						cppCompiler.args '-m64'
 					}
+					if (targetPlatform.operatingSystem.linux) {
+						cppCompiler.args '-I'
+						cppCompiler.args '/usr/lib/jvm/java-8-openjdk-amd64/include/'
+						cppCompiler.args '-I'
+						cppCompiler.args '/usr/lib/jvm/java-8-openjdk-amd64/include/linux/'
+					}
 
-					linker.args '-shared'
+					// compiler osx
+					if (targetPlatform.operatingSystem.osx) {
+						cppCompiler.args '-I'
+						cppCompiler.args '/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers'
+					}
+
+					// linker shared
 					linker.args '-l'
 					linker.args 'steam_api'
-					if (targetPlatform.name == "x86") {
+
+					// linker linux
+					if (targetPlatform.operatingSystem.linux) {
+						linker.args '-shared'
+					}
+
+					if (targetPlatform.operatingSystem.linux && targetPlatform.name == "x86") {
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/linux32"
 					}
-					if (targetPlatform.name == "x64") {
+					if (targetPlatform.operatingSystem.linux && targetPlatform.name == "x64") {
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/linux64"
+					}
+
+					// linker osx
+					if (targetPlatform.operatingSystem.osx) {
+						linker.args '-dynamiclib'
+					}
+					if (targetPlatform.operatingSystem.osx && targetPlatform.name == "x86") {
+						linker.args '-L'
+						linker.args "${steamSdkDirPath}/redistributable_bin/osx32"
+					}
+					if (targetPlatform.operatingSystem.osx && targetPlatform.name == "x64") {
+						linker.args '-L'
+						linker.args "${steamSdkDirPath}/redistributable_bin/osx64"
 					}
 				}
 			}
