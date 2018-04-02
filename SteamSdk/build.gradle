@@ -235,10 +235,7 @@ model {
 					linker.args 'User32.lib'
 				} else if (toolChain in Gcc) {
 					// compiler define linux
-					println("OPerating system is " + targetPlatform.operatingSystem.getClass())
-					println("OPerating system name=" + targetPlatform.operatingSystem.getName())
-					println("OPerating system=" + targetPlatform.operatingSystem)
-					if(targetPlatform.operatingSystem.getName().equalsIgnoreCase("linux")){
+					if (targetPlatform.operatingSystem.isLinux()) {
 						cppCompiler.define 'NG_LIN'
 						println("operating system is linux")
 					}
@@ -259,7 +256,7 @@ model {
 						cppCompiler.args '-m64'
 					}
 					// fixme this isn't returning true on Ubuntu
-					if (targetPlatform.operatingSystem == "linux") {
+					if (targetPlatform.operatingSystem.isLinux()) {
 						cppCompiler.args '-I'
 						cppCompiler.args '/usr/lib/jvm/java-8-openjdk-amd64/include/'
 						cppCompiler.args '-I'
@@ -267,7 +264,7 @@ model {
 					}
 
 					// compiler osx
-					if (targetPlatform.operatingSystem == "osx") {
+					if (targetPlatform.operatingSystem.isMacOsX()) {
 						cppCompiler.args '-I'
 						cppCompiler.args '/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers'
 					}
@@ -277,28 +274,33 @@ model {
 					linker.args 'steam_api'
 
 					// linker linux
-					if (targetPlatform.operatingSystem == "linux") {
+					if (targetPlatform.operatingSystem.isLinux()) {
 						linker.args '-shared'
 					}
 
-					if (targetPlatform.operatingSystem == "linux" && targetPlatform == "x86") {
+					println("targetPlatform class is " + targetPlatform.getClass().getName())
+					println("targetPlatform is " + targetPlatform)
+
+					if (targetPlatform == "linux32") {
+						println("platform is linux32")
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/linux32"
 					}
-					if (targetPlatform.operatingSystem == "linux" && targetPlatform == "x64") {
+					if (targetPlatform == "linux64") {
+						println("platform is linux64")
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/linux64"
 					}
 
 					// linker osx
-					if (targetPlatform.operatingSystem == "osx") {
+					if (targetPlatform.operatingSystem.isMacOsX()) {
 						linker.args '-dynamiclib'
 					}
-					if (targetPlatform.operatingSystem == "osx" && targetPlatform == "x86") {
+					if (targetPlatform == "osx32") {
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/osx32"
 					}
-					if (targetPlatform.operatingSystem == "osx" && targetPlatform == "x64") {
+					if (targetPlatform == "osx64") {
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/osx64"
 					}
