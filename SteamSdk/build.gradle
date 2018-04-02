@@ -234,7 +234,10 @@ model {
 					}
 					linker.args 'User32.lib'
 				} else if (toolChain in Gcc) {
-					cppCompiler.define 'NG_LIN'
+					// compiler define linux
+					if(targetPlatform.operatingSystem.name == "linux"){
+						cppCompiler.define 'NG_LIN'
+					}
 
 					cppCompiler.args '-I'
 					cppCompiler.args "${steamSdkDirPath}/public"
@@ -251,7 +254,7 @@ model {
 					if (targetPlatform.name == "linux64") {
 						cppCompiler.args '-m64'
 					}
-					if (targetPlatform.operatingSystem.linux) {
+					if (targetPlatform.operatingSystem.name == "linux") {
 						cppCompiler.args '-I'
 						cppCompiler.args '/usr/lib/jvm/java-8-openjdk-amd64/include/'
 						cppCompiler.args '-I'
@@ -259,7 +262,7 @@ model {
 					}
 
 					// compiler osx
-					if (targetPlatform.operatingSystem.osx) {
+					if (targetPlatform.operatingSystem.name == "osx") {
 						cppCompiler.args '-I'
 						cppCompiler.args '/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers'
 					}
@@ -269,28 +272,28 @@ model {
 					linker.args 'steam_api'
 
 					// linker linux
-					if (targetPlatform.operatingSystem.linux) {
+					if (targetPlatform.operatingSystem.name == "linux") {
 						linker.args '-shared'
 					}
 
-					if (targetPlatform.operatingSystem.linux && targetPlatform.name == "x86") {
+					if (targetPlatform.operatingSystem.name == "linux" && targetPlatform.name == "x86") {
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/linux32"
 					}
-					if (targetPlatform.operatingSystem.linux && targetPlatform.name == "x64") {
+					if (targetPlatform.operatingSystem.name == "linux" && targetPlatform.name == "x64") {
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/linux64"
 					}
 
 					// linker osx
-					if (targetPlatform.operatingSystem.osx) {
+					if (targetPlatform.operatingSystem.name == "osx") {
 						linker.args '-dynamiclib'
 					}
-					if (targetPlatform.operatingSystem.osx && targetPlatform.name == "x86") {
+					if (targetPlatform.operatingSystem.name.name == "osx" && targetPlatform.name == "x86") {
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/osx32"
 					}
-					if (targetPlatform.operatingSystem.osx && targetPlatform.name == "x64") {
+					if (targetPlatform.operatingSystem.name == "osx" && targetPlatform.name == "x64") {
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/osx64"
 					}
