@@ -222,12 +222,12 @@ model {
 					cppCompiler.args "/I${steamSdkDirPath}/public"
 
 					linker.args '/nologo'
-					if (targetPlatform.name == "windows32") {
+					if (targetPlatform == "windows32") {
 						linker.args "/libpath:${steamSdkDirPath}/public/steam/lib/win32"
 						linker.args "/libpath:${steamSdkDirPath}/redistributable_bin"
 						linker.args 'steam_api.lib'
 					}
-					if (targetPlatform.name == "windows64") {
+					if (targetPlatform == "windows64") {
 						linker.args "/libpath:${steamSdkDirPath}/public/steam/lib/win32"
 						linker.args "/libpath:${steamSdkDirPath}/redistributable_bin/win64"
 						linker.args 'steam_api64.lib'
@@ -235,7 +235,7 @@ model {
 					linker.args 'User32.lib'
 				} else if (toolChain in Gcc) {
 					// compiler define linux
-					if(targetPlatform.operatingSystem.name == "linux"){
+					if(targetPlatform.operatingSystem == "linux"){
 						cppCompiler.define 'NG_LIN'
 					}
 
@@ -248,13 +248,13 @@ model {
 					cppCompiler.args '-O2'
 
 					// compiler linux
-					if (targetPlatform.name == "linux32") {
+					if (targetPlatform == "linux32") {
 						cppCompiler.args '-m32'
 					}
-					if (targetPlatform.name == "linux64") {
+					if (targetPlatform == "linux64") {
 						cppCompiler.args '-m64'
 					}
-					if (targetPlatform.operatingSystem.name == "linux") {
+					if (targetPlatform.operatingSystem == "linux") {
 						cppCompiler.args '-I'
 						cppCompiler.args '/usr/lib/jvm/java-8-openjdk-amd64/include/'
 						cppCompiler.args '-I'
@@ -262,7 +262,7 @@ model {
 					}
 
 					// compiler osx
-					if (targetPlatform.operatingSystem.name == "osx") {
+					if (targetPlatform.operatingSystem == "osx") {
 						cppCompiler.args '-I'
 						cppCompiler.args '/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers'
 					}
@@ -272,28 +272,28 @@ model {
 					linker.args 'steam_api'
 
 					// linker linux
-					if (targetPlatform.operatingSystem.name == "linux") {
+					if (targetPlatform.operatingSystem == "linux") {
 						linker.args '-shared'
 					}
 
-					if (targetPlatform.operatingSystem.name == "linux" && targetPlatform.name == "x86") {
+					if (targetPlatform.operatingSystem == "linux" && targetPlatform == "x86") {
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/linux32"
 					}
-					if (targetPlatform.operatingSystem.name == "linux" && targetPlatform.name == "x64") {
+					if (targetPlatform.operatingSystem == "linux" && targetPlatform == "x64") {
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/linux64"
 					}
 
 					// linker osx
-					if (targetPlatform.operatingSystem.name == "osx") {
+					if (targetPlatform.operatingSystem == "osx") {
 						linker.args '-dynamiclib'
 					}
-					if (targetPlatform.operatingSystem.name.name == "osx" && targetPlatform.name == "x86") {
+					if (targetPlatform.operatingSystem == "osx" && targetPlatform == "x86") {
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/osx32"
 					}
-					if (targetPlatform.operatingSystem.name == "osx" && targetPlatform.name == "x64") {
+					if (targetPlatform.operatingSystem == "osx" && targetPlatform == "x64") {
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/osx64"
 					}
