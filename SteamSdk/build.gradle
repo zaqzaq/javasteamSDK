@@ -177,18 +177,18 @@ model {
 		gcc(Gcc) {
 			// Uncomment to use a GCC install that is not in the PATH
 			// path "/usr/bin/gcc"
-			target("osx32") {
-				eachPlatform { tools ->
-					tools.cppCompiler.executable = "g++4.0"
-					tools.linker.executable = "g++4.0"
-				}
-			}
-			target("osx64") {
-				eachPlatform { tools ->
-					tools.cppCompiler.executable = "g++4.0"
-					tools.linker.executable = "g++4.0"
-				}
-			}
+//			target("osx32") {
+//				eachPlatform { tools ->
+//					tools.cppCompiler.executable = "g++4.0"
+//					tools.linker.executable = "g++4.0"
+//				}
+//			}
+//			target("osx64") {
+//				eachPlatform { tools ->
+//					tools.cppCompiler.executable = "g++4.0"
+//					tools.linker.executable = "g++4.0"
+//				}
+//			}
 		}
 	}
 
@@ -222,12 +222,12 @@ model {
 					cppCompiler.args "/I${steamSdkDirPath}/public"
 
 					linker.args '/nologo'
-					if (targetPlatform == "windows32") {
+					if (targetPlatform.getName().equals("windows32")) {
 						linker.args "/libpath:${steamSdkDirPath}/public/steam/lib/win32"
 						linker.args "/libpath:${steamSdkDirPath}/redistributable_bin"
 						linker.args 'steam_api.lib'
 					}
-					if (targetPlatform == "windows64") {
+					if (targetPlatform.getName().equals("windows64")) {
 						linker.args "/libpath:${steamSdkDirPath}/public/steam/lib/win32"
 						linker.args "/libpath:${steamSdkDirPath}/redistributable_bin/win64"
 						linker.args 'steam_api64.lib'
@@ -237,7 +237,6 @@ model {
 					// compiler define linux
 					if (targetPlatform.operatingSystem.isLinux()) {
 						cppCompiler.define 'NG_LIN'
-						println("operating system is linux")
 					}
 
 					cppCompiler.args '-I'
@@ -249,10 +248,10 @@ model {
 					cppCompiler.args '-O2'
 
 					// compiler linux
-					if (targetPlatform == "linux32") {
+					if (targetPlatform.getName().equals("linux32")) {
 						cppCompiler.args '-m32'
 					}
-					if (targetPlatform == "linux64") {
+					if (targetPlatform.getName().equals("linux64")) {
 						cppCompiler.args '-m64'
 					}
 					// fixme this isn't returning true on Ubuntu
@@ -265,6 +264,7 @@ model {
 
 					// compiler osx
 					if (targetPlatform.operatingSystem.isMacOsX()) {
+						cppCompiler.executable = "g++4.0"
 						cppCompiler.args '-I'
 						cppCompiler.args '/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers'
 					}
@@ -278,15 +278,12 @@ model {
 						linker.args '-shared'
 					}
 
-					println("targetPlatform class is " + targetPlatform.getClass().getName())
-					println("targetPlatform is " + targetPlatform)
-
-					if (targetPlatform == "linux32") {
+					if (targetPlatform.getName().equals("linux32")) {
 						println("platform is linux32")
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/linux32"
 					}
-					if (targetPlatform == "linux64") {
+					if (targetPlatform.getName().equals("linux64")) {
 						println("platform is linux64")
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/linux64"
@@ -294,13 +291,14 @@ model {
 
 					// linker osx
 					if (targetPlatform.operatingSystem.isMacOsX()) {
+						linker.executable = "g++4.0"
 						linker.args '-dynamiclib'
 					}
-					if (targetPlatform == "osx32") {
+					if (targetPlatform.getName().equals("osx32")) {
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/osx32"
 					}
-					if (targetPlatform == "osx64") {
+					if (targetPlatform.getName().equals("osx64")) {
 						linker.args '-L'
 						linker.args "${steamSdkDirPath}/redistributable_bin/osx64"
 					}
