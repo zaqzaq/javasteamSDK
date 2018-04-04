@@ -203,6 +203,9 @@ model {
 		}
 		gcc(Gcc) {
 		}
+		xCode(XCode){
+			
+		}
 	}
 
 	components {
