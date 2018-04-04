@@ -1,4 +1,4 @@
-import groovy.swing.SwingBuilder
+import org.apache.tools.ant.taskdefs.condition.Os
 
 import java.nio.ByteBuffer
 import java.nio.file.Files
@@ -34,26 +34,54 @@ dependencies {
 
 publishing {
 	publications {
-		steamjnix86Publish(MavenPublication) {
-			groupId 'com.nimblygames'
-			artifactId 'steamjni'
-			version '1.0'
+		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+			steamjnix86Publish(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'steamjni'
+				version '1.0'
 
-			artifact extension: 'dll', source: "$projectDir/dist/steamjni.dll"
-		}
+				artifact extension: 'dll', source: "$projectDir/dist/steamjni.dll"
+			}
 
-		steamjnix64Publish(MavenPublication) {
-			groupId 'com.nimblygames'
-			artifactId 'steamjni64'
-			version '1.0'
+			steamjnix64Publish(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'steamjni64'
+				version '1.0'
 
-			artifact extension: 'dll', source: "$projectDir/dist/steamjni64.dll"
+				artifact extension: 'dll', source: "$projectDir/dist/steamjni64.dll"
+			}
+		} else if (Os.isFamily(Os.FAMILY_UNIX)) {
+			steamjnix86Publish(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'libsteamjni'
+				version '1.0'
+
+				artifact extension: 'so', source: "$projectDir/dist/libsteamjni.so"
+			}
+
+			steamjnix64Publish(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'libsteamjni64'
+				version '1.0'
+
+				artifact extension: 'so', source: "$projectDir/dist/libsteamjni64.so"
+			}
+		} else if (Os.isFamily(Os.FAMILY_MAC)) {
+			steamjnix86Publish(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'libsteamjni'
+				version '1.0'
+
+				artifact extension: 'dylib', source: "$projectDir/dist/libsteamjni.dylib"
+			}
 		}
 	}
 }
 
 // generate headers
-task nativeHeaders {
+// fixme enable caching
+task nativeHeaders(dependsOn: [
+		'classes']) {
 	def outputDirectory = file("src/steamjni/cpp")
 	def classes = [
 			'steam.steam_api',
@@ -142,7 +170,6 @@ classes.finalizedBy nativeHeaders
 // C++
 model {
 	platforms {
-		// fixme need platform for win, lin, osx 32 and 64... so six platforms?...
 		linux32 {
 			architecture "x86"
 			operatingSystem "linux"
@@ -175,20 +202,6 @@ model {
 			windowsSdkDir new File("C:/Program Files/Microsoft SDKs/Windows/v7.1")
 		}
 		gcc(Gcc) {
-			// Uncomment to use a GCC install that is not in the PATH
-			// path "/usr/bin/gcc"
-//			target("osx32") {
-//				eachPlatform { tools ->
-//					tools.cppCompiler.executable = "g++4.0"
-//					tools.linker.executable = "g++4.0"
-//				}
-//			}
-//			target("osx64") {
-//				eachPlatform { tools ->
-//					tools.cppCompiler.executable = "g++4.0"
-//					tools.linker.executable = "g++4.0"
-//				}
-//			}
 		}
 	}
 
@@ -212,6 +225,7 @@ model {
 					cppCompiler.define 'WIN32'
 					cppCompiler.define 'UNICODE'
 					cppCompiler.define '_UNICODE'
+					cppCompiler.define '_WIN32_WINNT_WINXP=0x0501' // target windows xp
 
 					cppCompiler.args '/O2'
 					cppCompiler.args '/EHs'
@@ -254,7 +268,7 @@ model {
 					if (targetPlatform.getName().equals("linux64")) {
 						cppCompiler.args '-m64'
 					}
-					// fixme this isn't returning true on Ubuntu
+
 					if (targetPlatform.operatingSystem.isLinux()) {
 						cppCompiler.args '-I'
 						cppCompiler.args '/usr/lib/jvm/java-8-openjdk-amd64/include/'
@@ -308,26 +322,41 @@ model {
 	}
 }
 
+// fixme need to update dependsOn based on OS
 task distribute(dependsOn: [
 		'classes',
 		'nativeHeaders',
-		'buildDependentsSteamjniX86SharedLibrary',
-		'buildDependentsSteamjniX64SharedLibrary'
+		'assemble'
 ]) {
 	description = "Copy all dll's to the dist folder"
 	group = "Distribution"
 	doLast {
-		// copy x86 dll
-		def steamjni86Dll = Paths.get("$projectDir/build/libs/steamjni/shared/x86/steamjni.dll")
-		def steamjni86DllDist = Paths.get("$projectDir/dist/steamjni.dll")
-		steamjni86DllDist.toFile().getParentFile().mkdirs()
-		Files.copy(steamjni86Dll, steamjni86DllDist, StandardCopyOption.REPLACE_EXISTING)
+		def steamJni32BitSharedLibrary
+		def steamJni32BitSharedLibraryDist
+		def steamJni64BitSharedLibrary
+		def steamJni64BitSharedLibraryDist
+		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+			steamJni32BitSharedLibrary = Paths.get("$projectDir/build/libs/steamjni/shared/windows32/steamjni.dll")
+			steamJni32BitSharedLibraryDist = Paths.get("$projectDir/dist/steamjni.dll")
 
-		// copy x64 dll
-		def steamjni64Dll = Paths.get("$projectDir/build/libs/steamjni/shared/x64/steamjni.dll")
-		def steamjni64DllDist = Paths.get("$projectDir/dist/steamjni64.dll")
-		steamjni64DllDist.toFile().getParentFile().mkdirs()
-		Files.copy(steamjni64Dll, steamjni64DllDist, StandardCopyOption.REPLACE_EXISTING)
+			steamJni64BitSharedLibrary = Paths.get("$projectDir/build/libs/steamjni/shared/windows64/steamjni.dll")
+			steamJni64BitSharedLibraryDist = Paths.get("$projectDir/dist/steamjni64.dll")
+		} else if (Os.isFamily(Os.FAMILY_UNIX)) {
+			steamJni32BitSharedLibrary = Paths.get("$projectDir/build/libs/steamjni/shared/linux32/libsteamjni.so")
+			steamJni32BitSharedLibraryDist = Paths.get("$projectDir/dist/libsteamjni.so")
+
+			steamJni64BitSharedLibrary = Paths.get("$projectDir/build/libs/steamjni/shared/linux64/libsteamjni.so")
+			steamJni64BitSharedLibraryDist = Paths.get("$projectDir/dist/libsteamjni64.so")
+		} else if (Os.isFamily(Os.FAMILY_MAC)) {
+			// fixme exec on osx
+//			lipo -create -arch i386 ../projects/SteamNative_eclipse_gcc_osx_x86_32bit/Release/libsteam.jni32.dylib -arch x86_64 ../projects/SteamNative_eclipse_gcc_osx_x86_64bit/Release/libsteam.jni64.dylib -output libsteam.jni.dylib
+		}
+
+		steamJni32BitSharedLibraryDist.toFile().getParentFile().mkdirs()
+		Files.copy(steamJni32BitSharedLibrary, steamJni32BitSharedLibraryDist, StandardCopyOption.REPLACE_EXISTING)
+
+		steamJni64BitSharedLibraryDist.toFile().getParentFile().mkdirs()
+		Files.copy(steamJni64BitSharedLibrary, steamJni64BitSharedLibraryDist, StandardCopyOption.REPLACE_EXISTING)
 	}
 }
 
@@ -355,56 +384,28 @@ artifactory {
 	clientConfig.info.setBuildName('version')
 	clientConfig.info.setBuildNumber('1')
 
-	//	clientConfig.publisher.repoKey = 'gradle-release-local'
-	//	clientConfig.publisher.username = getPassword.username
-	//	clientConfig.publisher.password = getPassword.password
+	clientConfig.publisher.repoKey = 'gradle-release-local'
+	// make a <user_home>/.gradle/gradle.properties files that contains your username and encrypted password
+	// encrypted password can be created at https://artifactory.nimblygames.com/artifactory/webapp/#/profile
+	clientConfig.publisher.username = rootProject.findProperty("artifactory_user")
+	clientConfig.publisher.password = rootProject.findProperty("artifactory_password")
 }
 
 artifactoryPublish {
-	//	doLast{
 	skip = false //Skip build info analysis and publishing (false by default)
-	properties { steamjnix86Publish '**:**:**:*@*', platform: 'win32' }
-	println "username = ${clientConfig.publisher.username}"
-	publications('steamjnix86Publish', 'steamjnix64Publish')
-	//	}
-
-	doLast {
-		clientConfig.publisher.repoKey = 'gradle-release-local'
-		clientConfig.publisher.username = promptUser("username:")
-		clientConfig.publisher.password = promptUser("password:");
+	publications('steamjnix86Publish')
+	if (Os.isFamily(Os.FAMILY_WINDOWS) || Os.isFamily(Os.FAMILY_UNIX)) {
+		publications('steamjnix64Publish')
 	}
 }
 
-def promptUser(prompt) {
-	def pass = ''
-	if (System.console() == null) {
-		new SwingBuilder().edt {
-			dialog(modal: true, // Otherwise the build will continue running before you closed the dialog
-					title: prompt, // Dialog title
-					alwaysOnTop: true, // pretty much what the name says
-					resizable: false, // Don't allow the user to resize the dialog
-					locationRelativeTo: null, // Place dialog in center of the screen
-					pack: true, // We need to pack the dialog (so it will take the size of it's children)
-					show: true // Let's show it
-			) {
-				vbox {
-					// Put everything below each other
-					label(text: prompt)
-					input = passwordField()
-					button(defaultButton: true, text: 'OK', actionPerformed: {
-						pass = new String(input.password); // Set pass variable to value of input field
-						dispose(); // Close dialog
-					})
-				} // vbox end
-			} // dialog end
-		} // edt end
-	} else {
-		pass = System.console().readPassword("\n${prompt} ")
-		pass = new String(pass)
-	}
-
-	if (pass.size() <= 0) {
-		throw new InvalidUserDataException("You must enter ${prompt} to proceed.")
-	}
-	return pass;
+tasks {
+	// no way to add depedency on nativeHeaders?
+//	tasks.getByName("assembleDependentsSteamjni").dependsOn("nativeHeaders")
+//	tasks.getByName("steamjniLinux32SharedLibrary").dependsOn("nativeHeaders")
+//	steamjniLinux64SharedLibrary.dependsOn("nativeHeaders")
+//	steamjniOsx32SharedLibrary.dependsOn("nativeHeaders")
+//	steamjniOsx64SharedLibrary.dependsOn("nativeHeaders")
+//	steamjniWindows32SharedLibrary.dependsOn("nativeHeaders")
+//	steamjniWindows64SharedLibrary.dependsOn("nativeHeaders")
 }
