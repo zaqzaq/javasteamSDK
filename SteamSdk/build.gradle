@@ -278,7 +278,7 @@ model {
 
 					// compiler osx
 					if (targetPlatform.operatingSystem.isMacOsX()) {
-						cppCompiler.executable = "g++4.0"
+						cppCompiler.executable = "g++-4.0"
 						cppCompiler.args '-I'
 						cppCompiler.args '/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers'
 					}
@@ -305,7 +305,7 @@ model {
 
 					// linker osx
 					if (targetPlatform.operatingSystem.isMacOsX()) {
-						linker.executable = "g++4.0"
+						linker.executable = "g++-4.0"
 						linker.args '-dynamiclib'
 					}
 					if (targetPlatform.getName().equals("osx32")) {
