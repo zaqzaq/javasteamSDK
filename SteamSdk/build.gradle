@@ -6,19 +6,23 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
 
-apply from: file('../build.gradle')
-apply plugin: 'java'
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-apply plugin: 'cpp'
+//apply from: file('../build.gradle')
 
 buildscript {
 	repositories { jcenter() }
 	dependencies { classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release" }
 }
 
-apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.artifactory'
+plugins {
+	id 'maven-publish'
+	id "com.jfrog.artifactory" version "4.7.1"
+	id 'cpp'
+	id 'java'
+	id 'xcode'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 ext { steamSdkDirPath = "${projectDir}/sdk/sdk_135" }
 
