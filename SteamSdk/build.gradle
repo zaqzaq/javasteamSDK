@@ -355,7 +355,18 @@ task distribute(dependsOn: [
 			steamJni64BitSharedLibrary = Paths.get("$projectDir/build/libs/steamjni/shared/linux64/libsteamjni.so")
 			steamJni64BitSharedLibraryDist = Paths.get("$projectDir/dist/libsteamjni64.so")
 		} else if (Os.isFamily(Os.FAMILY_MAC)) {
-			// fixme exec on osx
+			exec {
+				executable 'lipo'
+				args '-create'
+				args '-arch'
+				args 'i386'
+				args Paths.get("$projectDir/build/libs/steamjni/shared/linux32/libsteamjni.dylib")
+				args '-arch'
+				args 'x86_64'
+				args Paths.get("$projectDir/build/libs/steamjni/shared/linux64/libsteamjni.dylib")
+				args '-output'
+				args Paths.get("$projectDir/dist/libsteamjni.dylib")
+			}
 //			lipo -create -arch i386 ../projects/SteamNative_eclipse_gcc_osx_x86_32bit/Release/libsteam.jni32.dylib -arch x86_64 ../projects/SteamNative_eclipse_gcc_osx_x86_64bit/Release/libsteam.jni64.dylib -output libsteam.jni.dylib
 		}
 
