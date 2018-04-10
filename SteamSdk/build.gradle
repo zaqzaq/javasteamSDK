@@ -210,9 +210,6 @@ model {
 		clang(Clang) {
 
 		}
-		xcode(XCode){
-			
-		}
 	}
 
 	components {
