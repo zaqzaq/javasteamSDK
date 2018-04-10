@@ -210,9 +210,9 @@ model {
 		clang(Clang) {
 
 		}
-		xcode(XCode){
-			
-		}
+//		xcode(XCode){
+//
+//		}
 	}
 
 	components {
@@ -288,7 +288,7 @@ model {
 
 					// compiler osx
 					if (targetPlatform.operatingSystem.isMacOsX()) {
-						cppCompiler.executable = "g++-4.0"
+//						cppCompiler.executable = "g++-4.0"
 						cppCompiler.args '-I'
 						cppCompiler.args '/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers'
 					}
@@ -315,16 +315,16 @@ model {
 
 					// linker osx
 					if (targetPlatform.operatingSystem.isMacOsX()) {
-						linker.executable = "g++-4.0"
+//						linker.executable = "g++-4.0"
 						linker.args '-dynamiclib'
 					}
 					if (targetPlatform.getName().equals("osx32")) {
-						linker.args '-L'
-						linker.args "${steamSdkDirPath}/redistributable_bin/osx32"
+//						linker.args '-L'
+						linker.args "-L${steamSdkDirPath}/redistributable_bin/osx32"
 					}
 					if (targetPlatform.getName().equals("osx64")) {
-						linker.args '-L'
-						linker.args "${steamSdkDirPath}/redistributable_bin/osx64"
+//						linker.args '-L'
+						linker.args "-L${steamSdkDirPath}/redistributable_bin/osx32"
 					}
 				}
 			}
