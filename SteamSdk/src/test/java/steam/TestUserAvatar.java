@@ -1,19 +1,17 @@
 package steam;
 
+import junit.framework.TestCase;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
-import javax.imageio.ImageIO;
-
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import junit.framework.TestCase;
 
 public class TestUserAvatar extends TestCase {
 	private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -24,7 +22,7 @@ public class TestUserAvatar extends TestCase {
 	protected void setUp() throws Exception {
 		try {
 			LOG.info("setUp: initializing Steam.");
-			steam_api.loadNativeLibrariesFromJavaLibraryPath();
+			steam_api.loadNativeLibrariesFromDir(new File("build/dist"));
 			steam_api.SteamAPI_Init(steam_apiTest.STEAM_APP_ID_TEST);
 			callbackThread = startRunCallbackThread();
 		} catch (final Exception ex) {

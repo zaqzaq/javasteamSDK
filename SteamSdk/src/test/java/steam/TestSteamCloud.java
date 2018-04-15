@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;
@@ -19,7 +20,7 @@ public class TestSteamCloud extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		LOG.info("setUp: initializing Steam.");
-		steam_api.loadNativeLibrariesFromJavaLibraryPath();
+		steam_api.loadNativeLibrariesFromDir(new File("build/dist"));
 		steam_api.SteamAPI_Init(steam_apiTest.STEAM_APP_ID_TEST);
 		callbackThread = startRunCallbackThread();
 	}
