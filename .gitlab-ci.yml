@@ -22,7 +22,7 @@ buildWindows:
   tags:
     - windows
   script:
-    - gradlew assemble
+    - ./gradlew assemble
   artifacts:
     paths:
       - build/libs/*.jar
