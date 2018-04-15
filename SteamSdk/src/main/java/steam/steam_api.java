@@ -1,12 +1,11 @@
 package steam;
 
-import java.io.File;
-import java.lang.invoke.MethodHandles;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import steam.exception.SteamException;
+
+import java.io.File;
+import java.lang.invoke.MethodHandles;
 
 public class steam_api {
 	private static boolean loadedLibraries = false;
@@ -19,27 +18,32 @@ public class steam_api {
 
 	private static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 
-	public static synchronized void loadNativeLibrariesFromJavaLibraryPath() {
-		if (loadedLibraries) {
-			return;
-		}
-		attemptedToLoadLibraries = true;
-		if (OS_NAME.startsWith("mac")) {
-			System.loadLibrary("steamjni");
-			System.loadLibrary("steam_api");
-		} else {
-			System.loadLibrary("steam_api");
-			System.loadLibrary("steamjni");
-		}
-		LOG.info("Steam library loaded");
-		loadedLibraries = true;
-	}
-
 	static public boolean isWindows = System.getProperty("os.name").contains("Windows");
 	static public boolean isLinux = System.getProperty("os.name").contains("Linux");
 	static public boolean isMac = System.getProperty("os.name").contains("Mac");
 	// NOTE: os.arch is based on the architecture of the currently running JVM (not the computer's Operating System)
 	static public boolean is64Bit = System.getProperty("os.arch").equals("amd64") || System.getProperty("os.arch").equals("x86_64");
+
+	public static synchronized void loadNativeLibrariesFromJavaLibraryPath() {
+		if (loadedLibraries) {
+			return;
+		}
+		attemptedToLoadLibraries = true;
+
+		if (isWindows) {
+			System.loadLibrary("steamjni" + (is64Bit ? "64" : ""));
+			System.loadLibrary("steam_api" + (is64Bit ? "64" : ""));
+		} else if (isLinux) {
+			System.loadLibrary("steamjni" + (is64Bit ? "64" : ""));
+			System.loadLibrary("steam_api" + (is64Bit ? "64" : ""));
+		} else if (isMac) {
+			System.loadLibrary("steam_api");
+			System.loadLibrary("steamjni");
+		}
+
+		LOG.info("Steam library loaded");
+		loadedLibraries = true;
+	}
 
 	public static void loadLibrary(final File dir, final String libraryName) {
 		String filename;

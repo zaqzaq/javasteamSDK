@@ -24,7 +24,10 @@ plugins {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-ext { steamSdkDirPath = "${projectDir}/sdk/sdk_135" }
+ext {
+	steamSdkDirPath = "${projectDir}/sdk/sdk_135"
+	is64Bit = System.getProperty("os.arch").equals("amd64") || System.getProperty("os.arch").equals("x86_64");
+}
 
 repositories { jcenter() }
 
@@ -34,6 +37,8 @@ dependencies {
 
 	// logging
 	compile "org.slf4j:slf4j-api:${slf4jVersion}"
+	runtime "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+	runtime "org.apache.logging.log4j:log4j-core:${log4jVersion}"
 }
 
 publishing {
@@ -44,7 +49,7 @@ publishing {
 				artifactId 'steamjni'
 				version '1.0'
 
-				artifact extension: 'dll', source: "$projectDir/dist/steamjni.dll"
+				artifact extension: 'dll', source: "$projectDir/build/dist/steamjni.dll"
 			}
 
 			steamjnix64Publish(MavenPublication) {
@@ -52,7 +57,7 @@ publishing {
 				artifactId 'steamjni64'
 				version '1.0'
 
-				artifact extension: 'dll', source: "$projectDir/dist/steamjni64.dll"
+				artifact extension: 'dll', source: "$projectDir/build/dist/steamjni64.dll"
 			}
 		} else if (Os.isFamily(Os.FAMILY_UNIX)) {
 			steamjnix86Publish(MavenPublication) {
@@ -60,7 +65,7 @@ publishing {
 				artifactId 'libsteamjni'
 				version '1.0'
 
-				artifact extension: 'so', source: "$projectDir/dist/libsteamjni.so"
+				artifact extension: 'so', source: "$projectDir/build/dist/libsteamjni.so"
 			}
 
 			steamjnix64Publish(MavenPublication) {
@@ -68,7 +73,7 @@ publishing {
 				artifactId 'libsteamjni64'
 				version '1.0'
 
-				artifact extension: 'so', source: "$projectDir/dist/libsteamjni64.so"
+				artifact extension: 'so', source: "$projectDir/build/dist/libsteamjni64.so"
 			}
 		} else if (Os.isFamily(Os.FAMILY_MAC)) {
 			steamjnix86Publish(MavenPublication) {
@@ -76,7 +81,7 @@ publishing {
 				artifactId 'libsteamjni'
 				version '1.0'
 
-				artifact extension: 'dylib', source: "$projectDir/dist/libsteamjni.dylib"
+				artifact extension: 'dylib', source: "$projectDir/build/dist/libsteamjni.dylib"
 			}
 		}
 	}
@@ -202,13 +207,13 @@ model {
 
 	toolChains {
 		vc(VisualCpp) {
-			installDir new File("C:/Program Files (x86)/Microsoft Visual Studio 10.0")
+			installDir new File("C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community")
+//			installDir new File("C:/Program Files (x86)/Microsoft Visual Studio 10.0")
 			windowsSdkDir new File("C:/Program Files/Microsoft SDKs/Windows/v7.1")
 		}
 		gcc(Gcc) {
 		}
 		clang(Clang) {
-
 		}
 	}
 
@@ -228,7 +233,6 @@ model {
 					cppCompiler.define "DLL_EXPORT"
 					cppCompiler.define 'NG_WIN'
 					cppCompiler.define '_WIN32'
-					cppCompiler.define '_MSC_VER=1600'
 					cppCompiler.define 'WIN32'
 					cppCompiler.define 'UNICODE'
 					cppCompiler.define '_UNICODE'
@@ -247,13 +251,15 @@ model {
 						linker.args "/libpath:${steamSdkDirPath}/public/steam/lib/win32"
 						linker.args "/libpath:${steamSdkDirPath}/redistributable_bin"
 						linker.args 'steam_api.lib'
+						linker.args '/MACHINE:X86'
 					}
 					if (targetPlatform.getName().equals("windows64")) {
-						linker.args "/libpath:${steamSdkDirPath}/public/steam/lib/win32"
+						linker.args "/libpath:${steamSdkDirPath}/public/steam/lib/win64"
 						linker.args "/libpath:${steamSdkDirPath}/redistributable_bin/win64"
 						linker.args 'steam_api64.lib'
 					}
 					linker.args 'User32.lib'
+
 				} else if (toolChain in Gcc) {
 					// compiler define linux
 					if (targetPlatform.operatingSystem.isLinux()) {
@@ -344,16 +350,16 @@ task distribute(dependsOn: [
 		def steamJni64BitSharedLibraryDist
 		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
 			steamJni32BitSharedLibrary = Paths.get("$projectDir/build/libs/steamjni/shared/windows32/steamjni.dll")
-			steamJni32BitSharedLibraryDist = Paths.get("$projectDir/dist/steamjni.dll")
+			steamJni32BitSharedLibraryDist = Paths.get("$projectDir/build/dist/steamjni.dll")
 
 			steamJni64BitSharedLibrary = Paths.get("$projectDir/build/libs/steamjni/shared/windows64/steamjni.dll")
-			steamJni64BitSharedLibraryDist = Paths.get("$projectDir/dist/steamjni64.dll")
+			steamJni64BitSharedLibraryDist = Paths.get("$projectDir/build/dist/steamjni64.dll")
 		} else if (Os.isFamily(Os.FAMILY_UNIX)) {
 			steamJni32BitSharedLibrary = Paths.get("$projectDir/build/libs/steamjni/shared/linux32/libsteamjni.so")
-			steamJni32BitSharedLibraryDist = Paths.get("$projectDir/dist/libsteamjni.so")
+			steamJni32BitSharedLibraryDist = Paths.get("$projectDir/build/dist/libsteamjni.so")
 
 			steamJni64BitSharedLibrary = Paths.get("$projectDir/build/libs/steamjni/shared/linux64/libsteamjni.so")
-			steamJni64BitSharedLibraryDist = Paths.get("$projectDir/dist/libsteamjni64.so")
+			steamJni64BitSharedLibraryDist = Paths.get("$projectDir/build/dist/libsteamjni64.so")
 		} else if (Os.isFamily(Os.FAMILY_MAC)) {
 			exec {
 				executable 'lipo'
@@ -365,9 +371,8 @@ task distribute(dependsOn: [
 				args 'x86_64'
 				args Paths.get("$projectDir/build/libs/steamjni/shared/linux64/libsteamjni.dylib")
 				args '-output'
-				args Paths.get("$projectDir/dist/libsteamjni.dylib")
+				args Paths.get("$projectDir/build/dist/libsteamjni.dylib")
 			}
-//			lipo -create -arch i386 ../projects/SteamNative_eclipse_gcc_osx_x86_32bit/Release/libsteam.jni32.dylib -arch x86_64 ../projects/SteamNative_eclipse_gcc_osx_x86_64bit/Release/libsteam.jni64.dylib -output libsteam.jni.dylib
 		}
 
 		steamJni32BitSharedLibraryDist.toFile().getParentFile().mkdirs()
@@ -375,6 +380,13 @@ task distribute(dependsOn: [
 
 		steamJni64BitSharedLibraryDist.toFile().getParentFile().mkdirs()
 		Files.copy(steamJni64BitSharedLibrary, steamJni64BitSharedLibraryDist, StandardCopyOption.REPLACE_EXISTING)
+
+		// copy steam redistributables
+		def steamApiWin32 = Paths.get("${steamSdkDirPath}/redistributable_bin", "steam_api.dll")
+		Files.copy(steamApiWin32, Paths.get("${buildDir}/dist", "steam_api.dll"), StandardCopyOption.REPLACE_EXISTING)
+
+		def steamApiWin64 = Paths.get("${steamSdkDirPath}/redistributable_bin", "win64", "steam_api64.dll")
+		Files.copy(steamApiWin64, Paths.get("${buildDir}/dist", "steam_api64.dll"), StandardCopyOption.REPLACE_EXISTING);
 	}
 }
 
@@ -415,6 +427,14 @@ artifactoryPublish {
 	if (Os.isFamily(Os.FAMILY_WINDOWS) || Os.isFamily(Os.FAMILY_UNIX)) {
 		publications('steamjnix64Publish')
 	}
+}
+
+check{
+	dependsOn(distribute)
+}
+
+test{
+	dependsOn(distribute)
 }
 
 tasks {

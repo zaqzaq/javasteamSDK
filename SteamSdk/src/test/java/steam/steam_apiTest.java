@@ -1,8 +1,9 @@
 package steam;
 
+import junit.framework.TestCase;
 import org.junit.Test;
 
-import junit.framework.TestCase;
+import java.io.File;
 
 public class steam_apiTest extends TestCase {
 
@@ -12,8 +13,7 @@ public class steam_apiTest extends TestCase {
 
 	@Override
 	protected void setUp() throws Exception {
-		System.out.println("initing steam...");
-		steam_api.loadNativeLibrariesFromJavaLibraryPath();
+		steam_api.loadNativeLibrariesFromDir(new File("build/dist"));
 		steam_api.SteamAPI_Init(STEAM_APP_ID_TEST);
 		callbackThread = startRunCallbackThread();
 	}
@@ -27,7 +27,6 @@ public class steam_apiTest extends TestCase {
 
 	@Test
 	public void testFriends() {
-		System.out.println("wtf");
 		final CSteamID mySteamID = ISteamUser.GetSteamID();
 		System.out.println("my steam id is " + ISteamFriends.GetPersonaName() + " (" + mySteamID + ")");
 		System.out.println("Friends:");

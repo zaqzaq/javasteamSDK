@@ -1,16 +1,15 @@
 package steam;
 
+import junit.framework.TestCase;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
-
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import junit.framework.TestCase;
 
 public class TestSteamCloud extends TestCase {
 	private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -70,6 +69,11 @@ public class TestSteamCloud extends TestCase {
 
 			final boolean filePersisted = ISteamRemoteStorage.FilePersisted(fileNameAndSize.getName());
 			assertTrue(filePersisted);
+		}
+
+		if (avail <= 0) {
+			LOG.warn("Available bytes is 0");
+			return;
 		}
 
 		// write and read a file

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="TRACE">
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+		</Console>
+		<RollingFile name="SteamSdk">
+			<FileName>logs/SteamSdk.log</FileName>
+			<FilePattern>logs/SteamSdk.log.%i
+			</FilePattern>
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<Policies>
+				<OnStartupTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="4 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="5" />
+		</RollingFile>
+		<RollingFile name="SteamSdkError">
+			<FileName>logs/SteamSdkError.log
+			</FileName>
+			<FilePattern>logs/SteamSdkError.log.%i
+			</FilePattern>
+			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<Policies>
+				<OnStartupTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="4 MB" />
+			</Policies>
+			<DefaultRolloverStrategy max="5" />
+		</RollingFile>
+	</Appenders>
+	<Loggers>
+		<Root level="TRACE">
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="SteamSdk" />
+			<AppenderRef ref="SteamSdkError" level="error" />
+		</Root>
+	</Loggers>
+</Configuration>
