@@ -59,7 +59,7 @@ publishing {
 
 				artifact extension: 'dll', source: "$projectDir/build/dist/steamjni64.dll"
 			}
-		} else if (Os.isFamily(Os.FAMILY_UNIX)) {
+		} else if (Os.isFamily(Os.FAMILY_UNIX) && !Os.isFamily(Os.FAMILY_MAC)) {
 			steamjnix86Publish(MavenPublication) {
 				groupId 'com.nimblygames'
 				artifactId 'libsteamjni'
@@ -354,32 +354,41 @@ task distribute(dependsOn: [
 
 			steamJni64BitSharedLibrary = Paths.get("$projectDir/build/libs/steamjni/shared/windows64/steamjni.dll")
 			steamJni64BitSharedLibraryDist = Paths.get("$projectDir/build/dist/steamjni64.dll")
-		} else if (Os.isFamily(Os.FAMILY_UNIX)) {
+		} else if (Os.isFamily(Os.FAMILY_UNIX) && !Os.isFamily(Os.FAMILY_MAC)) {
 			steamJni32BitSharedLibrary = Paths.get("$projectDir/build/libs/steamjni/shared/linux32/libsteamjni.so")
 			steamJni32BitSharedLibraryDist = Paths.get("$projectDir/build/dist/libsteamjni.so")
 
 			steamJni64BitSharedLibrary = Paths.get("$projectDir/build/libs/steamjni/shared/linux64/libsteamjni.so")
 			steamJni64BitSharedLibraryDist = Paths.get("$projectDir/build/dist/libsteamjni64.so")
 		} else if (Os.isFamily(Os.FAMILY_MAC)) {
+			println("family is mac")
+
+			String dylib32 = Paths.get("$projectDir/build/libs/steamjni/shared/osx32/libsteamjni.dylib").toAbsolutePath().toString()
+			String dylib64 = Paths.get("$projectDir/build/libs/steamjni/shared/osx64/libsteamjni.dylib").toAbsolutePath().toString()
+			String dylibCombined = Paths.get("$projectDir/build/dist/libsteamjni.dylib").toAbsolutePath().toString()
 			exec {
 				executable 'lipo'
 				args '-create'
 				args '-arch'
 				args 'i386'
-				args Paths.get("$projectDir/build/libs/steamjni/shared/linux32/libsteamjni.dylib")
+				args dylib32
 				args '-arch'
 				args 'x86_64'
-				args Paths.get("$projectDir/build/libs/steamjni/shared/linux64/libsteamjni.dylib")
+				args dylib64
 				args '-output'
-				args Paths.get("$projectDir/build/dist/libsteamjni.dylib")
+				args dylibCombined
 			}
 		}
 
-		steamJni32BitSharedLibraryDist.toFile().getParentFile().mkdirs()
-		Files.copy(steamJni32BitSharedLibrary, steamJni32BitSharedLibraryDist, StandardCopyOption.REPLACE_EXISTING)
+		if (steamJni32BitSharedLibraryDist != null) {
+			steamJni32BitSharedLibraryDist.toFile().getParentFile().mkdirs()
+			Files.copy(steamJni32BitSharedLibrary, steamJni32BitSharedLibraryDist, StandardCopyOption.REPLACE_EXISTING)
+		}
 
-		steamJni64BitSharedLibraryDist.toFile().getParentFile().mkdirs()
-		Files.copy(steamJni64BitSharedLibrary, steamJni64BitSharedLibraryDist, StandardCopyOption.REPLACE_EXISTING)
+		if (steamJni64BitSharedLibraryDist != null) {
+			steamJni64BitSharedLibraryDist.toFile().getParentFile().mkdirs()
+			Files.copy(steamJni64BitSharedLibrary, steamJni64BitSharedLibraryDist, StandardCopyOption.REPLACE_EXISTING)
+		}
 
 		// copy steam redistributables
 		def steamApiWin32 = Paths.get("${steamSdkDirPath}/redistributable_bin", "steam_api.dll")
@@ -424,7 +433,7 @@ artifactory {
 artifactoryPublish {
 	skip = false //Skip build info analysis and publishing (false by default)
 	publications('steamjnix86Publish')
-	if (Os.isFamily(Os.FAMILY_WINDOWS) || Os.isFamily(Os.FAMILY_UNIX)) {
+	if (Os.isFamily(Os.FAMILY_WINDOWS) || (Os.isFamily(Os.FAMILY_UNIX) && !Os.isFamily(Os.FAMILY_MAC))) {
 		publications('steamjnix64Publish')
 	}
 }
