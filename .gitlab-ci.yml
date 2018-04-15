@@ -1,8 +1,10 @@
 
 stages:
   - wake
-  - build
-  - test
+  - buildLinux
+  - buildOsx
+  - testLinux
+  - testOsx
 
 wake:
   stage: wake
@@ -13,8 +15,10 @@ wake:
     - sleep 1m
 
 
-build:
-  stage: build
+buildLinux:
+  stage: buildLinux
+  tags:
+    - ubuntu
   script:
     - ./gradlew assemble
   artifacts:
@@ -22,8 +26,24 @@ build:
       - build/libs/*.jar
     expire_in: 1 week
 
-test:
-  stage: test
+buildOsx:
+  stage: buildOsx
+  tags:
+    - osx
+  script:
+    - ./gradlew assemble
+  artifacts:
+    paths:
+      - build/libs/*.jar
+    expire_in: 1 week
+
+testLinux:
+  stage: testLinux
+  script:
+    - ./gradlew check
+
+testOsx:
+  stage: testOsx
   script:
     - ./gradlew check
 
