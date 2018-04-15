@@ -1,8 +1,10 @@
 
 stages:
   - wake
+  - buildWindows
   - buildLinux
   - buildOsx
+  - testWindows
   - testLinux
   - testOsx
 
@@ -12,8 +14,19 @@ wake:
     - ubuntu
   script:
     - wakeonlan 10:9A:DD:51:F5:11
+    - wakeonlan 70:85:C2:59:37:97
     - sleep 1m
 
+buildWindows:
+  stage: buildWindows
+  tags:
+    - windows
+  script:
+    - gradlew assemble
+  artifacts:
+    paths:
+      - build/libs/*.jar
+    expire_in: 1 week
 
 buildLinux:
   stage: buildLinux
@@ -36,6 +49,11 @@ buildOsx:
     paths:
       - build/libs/*.jar
     expire_in: 1 week
+
+testWindows:
+  stage: testWindows
+  script:
+    - gradlew check
 
 testLinux:
   stage: testLinux
