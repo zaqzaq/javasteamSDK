@@ -15,6 +15,9 @@ wake:
 
 build:
   stage: build
+  tags:
+    - ubuntu
+    - osx
   script:
     - ./gradlew assemble
   artifacts:
