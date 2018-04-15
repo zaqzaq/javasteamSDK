@@ -396,6 +396,12 @@ task distribute(dependsOn: [
 
 		def steamApiWin64 = Paths.get("${steamSdkDirPath}/redistributable_bin", "win64", "steam_api64.dll")
 		Files.copy(steamApiWin64, Paths.get("${buildDir}/dist", "steam_api64.dll"), StandardCopyOption.REPLACE_EXISTING);
+
+		def steamApiLinux32 = Paths.get("${steamSdkDirPath}/redistributable_bin", "linux32", "libsteam_api.so")
+		Files.copy(steamApiLinux32, Paths.get("${buildDir}/dist", "libsteam_api.so"), StandardCopyOption.REPLACE_EXISTING)
+
+		def steamApiLinux64 = Paths.get("${steamSdkDirPath}/redistributable_bin", "linux64", "libsteam_api.so")
+		Files.copy(steamApiLinux64, Paths.get("${buildDir}/dist", "libsteam_api64.so"), StandardCopyOption.REPLACE_EXISTING);
 	}
 }
 
