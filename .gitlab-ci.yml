@@ -3,9 +3,11 @@ stages:
   - wake
   - buildWindows
   - buildLinux
+  - wake
   - buildOsx
   - testWindows
   - testLinux
+  - wake
   - testOsx
 
 wake:
@@ -53,7 +55,7 @@ buildOsx:
 testWindows:
   stage: testWindows
   script:
-    - gradlew check
+    - ./gradlew check
 
 testLinux:
   stage: testLinux
