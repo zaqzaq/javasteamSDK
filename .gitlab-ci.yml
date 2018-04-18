@@ -54,42 +54,42 @@ testWindows:
   tags:
     - windows
   script:
-    - ./gradlew check
+    - ./gradlew -i check
 
 testLinux:
   stage: test
   tags:
     - ubuntu
   script:
-    - ./gradlew check
+    - ./gradlew -i check
 
 testOsx:
   stage: test
   tags:
     - osx
   script:
-    - ./gradlew check
+    - ./gradlew -i check
 
 publishWindows:
   stage: publish
   tags:
     - windows
   script:
-    - ./gradlew artifactoryDeploy
+    - ./gradlew artifactoryPublish
 
 publishLinux:
   stage: publish
   tags:
     - ubuntu
   script:
-    - ./gradlew artifactoryDeploy
+    - ./gradlew artifactoryPublish
 
 publishOsx:
   stage: publish
   tags:
     - osx
   script:
-    - ./gradlew artifactoryDeploy
+    - ./gradlew artifactoryPublish
 
 after_script:
   - echo "End CI"
