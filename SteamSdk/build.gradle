@@ -333,6 +333,33 @@ model {
 			}
 		}
 	}
+
+	// windows
+	tasks.compileSteamjniWindows32SharedLibrarySteamjniCpp {
+		dependsOn nativeHeaders
+	}
+	tasks.compileSteamjniWindows64SharedLibrarySteamjniCpp {
+		dependsOn nativeHeaders
+	}
+	// linux
+	tasks.compileSteamjniLinux32SharedLibrarySteamjniCpp {
+		dependsOn nativeHeaders
+	}
+	tasks.compileSteamjniLinux64SharedLibrarySteamjniCpp {
+		dependsOn nativeHeaders
+	}
+	// windows
+	tasks.compileSteamjniOsx32SharedLibrarySteamjniCpp {
+		dependsOn nativeHeaders
+	}
+	tasks.compileSteamjniOsx64SharedLibrarySteamjniCpp {
+		dependsOn nativeHeaders
+	}
+//	tasks{
+//		forEach({theTask->println(theTask)})
+//	}
+//	tasks.getAsMap().forEach({ thingy, itT -> println(itT) })
+
 }
 
 // fixme need to update dependsOn based on OS
@@ -449,21 +476,10 @@ artifactoryPublish {
 	}
 }
 
-check{
+check {
 	dependsOn(distribute)
 }
 
-test{
+test {
 	dependsOn(distribute)
-}
-
-tasks {
-	// no way to add depedency on nativeHeaders?
-//	tasks.getByName("assembleDependentsSteamjni").dependsOn("nativeHeaders")
-//	tasks.getByName("steamjniLinux32SharedLibrary").dependsOn("nativeHeaders")
-//	steamjniLinux64SharedLibrary.dependsOn("nativeHeaders")
-//	steamjniOsx32SharedLibrary.dependsOn("nativeHeaders")
-//	steamjniOsx64SharedLibrary.dependsOn("nativeHeaders")
-//	steamjniWindows32SharedLibrary.dependsOn("nativeHeaders")
-//	steamjniWindows64SharedLibrary.dependsOn("nativeHeaders")
 }
