@@ -1,14 +1,9 @@
 
 stages:
   - wake
-  - buildWindows
-  - buildLinux
+  - build
   - wake
-  - buildOsx
-  - testWindows
-  - testLinux
-  - wake
-  - testOsx
+  - test
 
 wake:
   stage: wake
@@ -20,7 +15,7 @@ wake:
     - sleep 1m
 
 buildWindows:
-  stage: buildWindows
+  stage: build
   tags:
     - windows
   script:
@@ -31,7 +26,7 @@ buildWindows:
     expire_in: 1 week
 
 buildLinux:
-  stage: buildLinux
+  stage: build
   tags:
     - ubuntu
   script:
@@ -42,7 +37,7 @@ buildLinux:
     expire_in: 1 week
 
 buildOsx:
-  stage: buildOsx
+  stage: build
   tags:
     - osx
   script:
@@ -53,17 +48,17 @@ buildOsx:
     expire_in: 1 week
 
 testWindows:
-  stage: testWindows
+  stage: test
   script:
     - ./gradlew check
 
 testLinux:
-  stage: testLinux
+  stage: test
   script:
     - ./gradlew check
 
 testOsx:
-  stage: testOsx
+  stage: test
   script:
     - ./gradlew check
 
