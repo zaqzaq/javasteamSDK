@@ -66,6 +66,22 @@ testOsx:
 
 publishWindows:
   stage: publish
+  tags:
+    - windows
+  script:
+    - ./gradlew artifactoryDeploy
+
+publishLinux:
+  stage: publish
+  tags:
+    - ubuntu
+  script:
+    - ./gradlew artifactoryDeploy
+
+publishOsx:
+  stage: publish
+  tags:
+    - osx
   script:
     - ./gradlew artifactoryDeploy
 
