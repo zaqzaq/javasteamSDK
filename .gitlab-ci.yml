@@ -51,16 +51,22 @@ buildOsx:
 
 testWindows:
   stage: test
+  tags:
+    - windows
   script:
     - ./gradlew check
 
 testLinux:
   stage: test
+  tags:
+    - ubuntu
   script:
     - ./gradlew check
 
 testOsx:
   stage: test
+  tags:
+    - osx
   script:
     - ./gradlew check
 
