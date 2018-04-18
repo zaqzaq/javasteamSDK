@@ -470,6 +470,7 @@ artifactory {
 
 artifactoryPublish {
 	dependsOn assemble
+	dependsOn distribute
 	skip = false //Skip build info analysis and publishing (false by default)
 	publications('steamjnix86Publish')
 	if (Os.isFamily(Os.FAMILY_WINDOWS) || (Os.isFamily(Os.FAMILY_UNIX) && !Os.isFamily(Os.FAMILY_MAC))) {
