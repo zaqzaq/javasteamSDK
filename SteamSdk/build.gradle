@@ -105,6 +105,9 @@ task nativeHeaders(dependsOn: [
 			'steam.ISteamController',
 			'steam.ISteamApps'
 	]
+	inputs.files sourceSets.main.output
+	inputs.property('classes', classes)
+	outputs.dir outputDirectory
 	doLast {
 		outputDirectory.parentFile.mkdirs()
 		exec {
@@ -208,7 +211,6 @@ model {
 	toolChains {
 		vc(VisualCpp) {
 			installDir new File("C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community")
-//			installDir new File("C:/Program Files (x86)/Microsoft Visual Studio 10.0")
 			windowsSdkDir new File("C:/Program Files/Microsoft SDKs/Windows/v7.1")
 		}
 		gcc(Gcc) {
