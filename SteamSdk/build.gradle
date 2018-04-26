@@ -10,7 +10,7 @@ import java.nio.file.StandardOpenOption
 
 buildscript {
 	repositories { jcenter() }
-	dependencies { classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release" }
+//	dependencies { classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.7.1" }
 }
 
 plugins {
@@ -58,6 +58,46 @@ publishing {
 				version '1.0'
 
 				artifact extension: 'dll', source: "$projectDir/build/dist/steamjni64.dll"
+			}
+
+			steamApiLinux32(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'libsteam_api'
+				version '1.0'
+
+				artifact extension: 'so', source: "$steamSdkDirPath/redistributable_bin/linux32/libsteam_api.so"
+			}
+
+			steamApiLinux64(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'libsteam_api64'
+				version '1.0'
+
+				artifact extension: 'so', source: "$steamSdkDirPath/redistributable_bin/linux64/libsteam_api.so"
+			}
+
+			steamApiOsx(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'libsteam_api'
+				version '1.0'
+
+				artifact extension: 'dylib', source: "$steamSdkDirPath/redistributable_bin/osx32/libsteam_api.dylib"
+			}
+
+			steamApiWindows32(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'steam_api'
+				version '1.0'
+
+				artifact extension: 'dll', source: "$steamSdkDirPath/redistributable_bin/steam_api.dll"
+			}
+
+			steamApiWindows64(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'steam_api64'
+				version '1.0'
+
+				artifact extension: 'dll', source: "$steamSdkDirPath/redistributable_bin/win64/steam_api64.dll"
 			}
 		} else if (Os.isFamily(Os.FAMILY_UNIX) && !Os.isFamily(Os.FAMILY_MAC)) {
 			steamjnix86Publish(MavenPublication) {
@@ -477,6 +517,9 @@ artifactoryPublish {
 	publications('steamjnix86Publish')
 	if (Os.isFamily(Os.FAMILY_WINDOWS) || (Os.isFamily(Os.FAMILY_UNIX) && !Os.isFamily(Os.FAMILY_MAC))) {
 		publications('steamjnix64Publish')
+	}
+	if(Os.isFamily(Os.FAMILY_WINDOWS)){
+		publications('steamApiLinux32', 'steamApiLinux64', 'steamApiOsx', 'steamApiWindows32', 'steamApiWindows64')
 	}
 }
 
