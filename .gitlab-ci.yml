@@ -75,21 +75,21 @@ publishWindows:
   tags:
     - windows
   script:
-    - ./gradlew artifactoryPublish
+    - ./gradlew publish
 
 publishLinux:
   stage: publish
   tags:
     - ubuntu
   script:
-    - ./gradlew artifactoryPublish
+    - ./gradlew publish
 
 publishOsx:
   stage: publish
   tags:
     - osx
   script:
-    - ./gradlew artifactoryPublish
+    - ./gradlew publish
 
 after_script:
   - echo "End CI"

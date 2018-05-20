@@ -6,16 +6,8 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
 
-//apply from: file('../build.gradle')
-
-buildscript {
-	repositories { jcenter() }
-//	dependencies { classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.7.1" }
-}
-
 plugins {
 	id 'maven-publish'
-	id "com.jfrog.artifactory" version "4.7.1"
 	id 'cpp'
 	id 'java'
 	id 'xcode'
@@ -122,6 +114,16 @@ publishing {
 				version '1.0'
 
 				artifact extension: 'dylib', source: "$projectDir/build/dist/libsteamjni.dylib"
+			}
+		}
+	}
+
+	repositories {
+		maven {
+			url 'https://artifactory.nimblygames.com/artifactory/gradle-release-local/'
+			credentials {
+				username rootProject.findProperty("artifactory_user")
+				password rootProject.findProperty("artifactory_password")
 			}
 		}
 	}
@@ -476,50 +478,6 @@ task distribute(dependsOn: [
 
 		def steamApiOsx = Paths.get("${steamSdkDirPath}/redistributable_bin", "osx32", "libsteam_api.dylib")
 		Files.copy(steamApiOsx, Paths.get("${buildDir}/dist", "libsteam_api.dylib"), StandardCopyOption.REPLACE_EXISTING);
-	}
-}
-
-artifactory {
-	contextUrl = 'https://artifactory.nimblygames.com/artifactory'
-	//The base Artifactory URL if not overridden by the publisher/resolver
-	publish {
-		//		defaults {
-		//			publications ('mavenJava')
-		//			publishConfigs('archives')
-		//		}
-
-		//		properties {
-		//Optional closure to attach properties to artifacts based on a list of artifact patterns per project publication
-		//			foo '*:*:*:*@*', platform: 'linux', 'win64'                //The property platform=linux,win64 will be set on all artifacts in foo publication
-		//			mavenJava 'org.jfrog:*:*:*@*', key1: 'val1'                //The property key1=val1 will be set on all artifacts part of the mavenJava publication and with group org.jfrog
-		//			all 'org.jfrog:shared:1.?:*@*', key2: 'val2', key3: 'val3' //The properties key2 and key3 will be set on all published artifacts (all publications) with group:artifact:version
-		//																	   //equal to org.jfrog:shared:1.?
-		//		}
-		publishBuildInfo = true   //Publish build-info to Artifactory (true by default)
-		publishArtifacts = true   //Publish artifacts to Artifactory (true by default)
-		publishPom = true   //Publish generated POM files to Artifactory (true by default).
-		publishIvy = false   //Publish generated Ivy descriptor files to Artifactory (true by default).
-	}
-	clientConfig.info.setBuildName('version')
-	clientConfig.info.setBuildNumber('1')
-
-	clientConfig.publisher.repoKey = 'gradle-release-local'
-	// make a <user_home>/.gradle/gradle.properties files that contains your username and encrypted password
-	// encrypted password can be created at https://artifactory.nimblygames.com/artifactory/webapp/#/profile
-	clientConfig.publisher.username = rootProject.findProperty("artifactory_user")
-	clientConfig.publisher.password = rootProject.findProperty("artifactory_password")
-}
-
-artifactoryPublish {
-	dependsOn assemble
-	dependsOn distribute
-	skip = false //Skip build info analysis and publishing (false by default)
-	publications('steamjnix86Publish')
-	if (Os.isFamily(Os.FAMILY_WINDOWS) || (Os.isFamily(Os.FAMILY_UNIX) && !Os.isFamily(Os.FAMILY_MAC))) {
-		publications('steamjnix64Publish')
-	}
-	if(Os.isFamily(Os.FAMILY_WINDOWS)){
-		publications('steamApiLinux32', 'steamApiLinux64', 'steamApiOsx', 'steamApiWindows32', 'steamApiWindows64')
 	}
 }
 
