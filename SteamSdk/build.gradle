@@ -33,107 +33,6 @@ dependencies {
 	runtime "org.apache.logging.log4j:log4j-core:${log4jVersion}"
 }
 
-publish{
-	dependsOn assemble
-	dependsOn distribute
-}
-
-publishing {
-	publications {
-		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-			steamjnix86Publish(MavenPublication) {
-				groupId 'com.nimblygames'
-				artifactId 'steamjni'
-				version '1.0'
-
-				artifact extension: 'dll', source: "$projectDir/build/dist/steamjni.dll"
-			}
-
-			steamjnix64Publish(MavenPublication) {
-				groupId 'com.nimblygames'
-				artifactId 'steamjni64'
-				version '1.0'
-
-				artifact extension: 'dll', source: "$projectDir/build/dist/steamjni64.dll"
-			}
-
-			steamApiLinux32(MavenPublication) {
-				groupId 'com.nimblygames'
-				artifactId 'libsteam_api'
-				version '1.0'
-
-				artifact extension: 'so', source: "$steamSdkDirPath/redistributable_bin/linux32/libsteam_api.so"
-			}
-
-			steamApiLinux64(MavenPublication) {
-				groupId 'com.nimblygames'
-				artifactId 'libsteam_api64'
-				version '1.0'
-
-				artifact extension: 'so', source: "$steamSdkDirPath/redistributable_bin/linux64/libsteam_api.so"
-			}
-
-			steamApiOsx(MavenPublication) {
-				groupId 'com.nimblygames'
-				artifactId 'libsteam_api'
-				version '1.0'
-
-				artifact extension: 'dylib', source: "$steamSdkDirPath/redistributable_bin/osx32/libsteam_api.dylib"
-			}
-
-			steamApiWindows32(MavenPublication) {
-				groupId 'com.nimblygames'
-				artifactId 'steam_api'
-				version '1.0'
-
-				artifact extension: 'dll', source: "$steamSdkDirPath/redistributable_bin/steam_api.dll"
-			}
-
-			steamApiWindows64(MavenPublication) {
-				groupId 'com.nimblygames'
-				artifactId 'steam_api64'
-				version '1.0'
-
-				artifact extension: 'dll', source: "$steamSdkDirPath/redistributable_bin/win64/steam_api64.dll"
-			}
-		} else if (Os.isFamily(Os.FAMILY_UNIX) && !Os.isFamily(Os.FAMILY_MAC)) {
-			steamjnix86Publish(MavenPublication) {
-				groupId 'com.nimblygames'
-				artifactId 'libsteamjni'
-				version '1.0'
-
-				artifact extension: 'so', source: "$projectDir/build/dist/libsteamjni.so"
-			}
-
-			steamjnix64Publish(MavenPublication) {
-				groupId 'com.nimblygames'
-				artifactId 'libsteamjni64'
-				version '1.0'
-
-				artifact extension: 'so', source: "$projectDir/build/dist/libsteamjni64.so"
-			}
-		} else if (Os.isFamily(Os.FAMILY_MAC)) {
-			steamjnix86Publish(MavenPublication) {
-				groupId 'com.nimblygames'
-				artifactId 'libsteamjni'
-				version '1.0'
-
-				artifact extension: 'dylib', source: "$projectDir/build/dist/libsteamjni.dylib"
-			}
-		}
-	}
-
-	repositories {
-		maven {
-			url 'https://artifactory.nimblygames.com/artifactory/gradle-release-local/'
-			credentials {
-				username rootProject.findProperty("artifactory_user")
-				password rootProject.findProperty("artifactory_password")
-			}
-		}
-	}
-}
-
 // generate headers
 // fixme enable caching
 task nativeHeaders(dependsOn: [
@@ -411,7 +310,6 @@ model {
 
 }
 
-// fixme need to update dependsOn based on OS
 task distribute(dependsOn: [
 		'classes',
 		'nativeHeaders',
@@ -492,4 +390,104 @@ check {
 
 test {
 	dependsOn(distribute)
+}
+
+publishing {
+	publications {
+		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+			steamjnix86Publish(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'steamjni'
+				version '1.0'
+
+				artifact extension: 'dll', source: "$projectDir/build/dist/steamjni.dll"
+			}
+
+			steamjnix64Publish(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'steamjni64'
+				version '1.0'
+
+				artifact extension: 'dll', source: "$projectDir/build/dist/steamjni64.dll"
+			}
+
+			steamApiLinux32(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'libsteam_api'
+				version '1.0'
+
+				artifact extension: 'so', source: "$steamSdkDirPath/redistributable_bin/linux32/libsteam_api.so"
+			}
+
+			steamApiLinux64(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'libsteam_api64'
+				version '1.0'
+
+				artifact extension: 'so', source: "$steamSdkDirPath/redistributable_bin/linux64/libsteam_api.so"
+			}
+
+			steamApiOsx(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'libsteam_api'
+				version '1.0'
+
+				artifact extension: 'dylib', source: "$steamSdkDirPath/redistributable_bin/osx32/libsteam_api.dylib"
+			}
+
+			steamApiWindows32(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'steam_api'
+				version '1.0'
+
+				artifact extension: 'dll', source: "$steamSdkDirPath/redistributable_bin/steam_api.dll"
+			}
+
+			steamApiWindows64(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'steam_api64'
+				version '1.0'
+
+				artifact extension: 'dll', source: "$steamSdkDirPath/redistributable_bin/win64/steam_api64.dll"
+			}
+		} else if (Os.isFamily(Os.FAMILY_UNIX) && !Os.isFamily(Os.FAMILY_MAC)) {
+			steamjnix86Publish(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'libsteamjni'
+				version '1.0'
+
+				artifact extension: 'so', source: "$projectDir/build/dist/libsteamjni.so"
+			}
+
+			steamjnix64Publish(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'libsteamjni64'
+				version '1.0'
+
+				artifact extension: 'so', source: "$projectDir/build/dist/libsteamjni64.so"
+			}
+		} else if (Os.isFamily(Os.FAMILY_MAC)) {
+			steamjnix86Publish(MavenPublication) {
+				groupId 'com.nimblygames'
+				artifactId 'libsteamjni'
+				version '1.0'
+
+				artifact extension: 'dylib', source: "$projectDir/build/dist/libsteamjni.dylib"
+			}
+		}
+
+		tasks.each{ theTask->
+			println("publications: thetask = " + theTask.name)
+		}
+	}
+
+	repositories {
+		maven {
+			url 'https://artifactory.nimblygames.com/artifactory/gradle-release-local/'
+			credentials {
+				username rootProject.findProperty("artifactory_user")
+				password rootProject.findProperty("artifactory_password")
+			}
+		}
+	}
 }
