@@ -475,10 +475,6 @@ publishing {
 				artifact extension: 'dylib', source: "$projectDir/build/dist/libsteamjni.dylib"
 			}
 		}
-
-		tasks.each{ theTask->
-			println("publications: thetask = " + theTask.name)
-		}
 	}
 
 	repositories {
@@ -491,3 +487,22 @@ publishing {
 		}
 	}
 }
+
+// fixme need publish tasks to depend on distribute... can't figure out a way to do this
+//if(tasks.getByName("publishSteamApiLinux32PublicationToMavenLocal") != null) {
+//	tasks publishSteamApiLinux32PublicationToMavenLocal { dependsOn(distribute) }
+//}
+
+//	publishSteamApiLinux32PublicationToMavenRepository{dependsOn(distribute)}
+//	publishSteamApiLinux64PublicationToMavenLocal{dependsOn(distribute)}
+//	publishSteamApiLinux64PublicationToMavenRepository{dependsOn(distribute)}
+//	publishSteamApiOsxPublicationToMavenLocal{dependsOn(distribute)}
+//	publishSteamApiOsxPublicationToMavenRepository{dependsOn(distribute)}
+//	publishSteamApiWindows32PublicationToMavenLocal{dependsOn(distribute)}
+//	publishSteamApiWindows32PublicationToMavenRepository{dependsOn(distribute)}
+//	publishSteamApiWindows64PublicationToMavenLocal{dependsOn(distribute)}
+//	publishSteamApiWindows64PublicationToMavenRepository{dependsOn(distribute)}
+//	publishSteamjnix64PublishPublicationToMavenLocal{dependsOn(distribute)}
+//	publishSteamjnix64PublishPublicationToMavenRepository{dependsOn(distribute)}
+//	publishSteamjnix86PublishPublicationToMavenLocal{dependsOn(distribute)}
+//	publishSteamjnix86PublishPublicationToMavenRepository{dependsOn(distribute)}

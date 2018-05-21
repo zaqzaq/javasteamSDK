@@ -75,6 +75,7 @@ publishWindows:
   tags:
     - windows
   script:
+    - ./gradlew distribute distribute
     - ./gradlew distribute publish
 
 publishLinux:
@@ -82,6 +83,7 @@ publishLinux:
   tags:
     - ubuntu
   script:
+    - ./gradlew distribute distribute
     - ./gradlew distribute publish
 
 publishOsx:
@@ -89,6 +91,7 @@ publishOsx:
   tags:
     - osx
   script:
+    - ./gradlew distribute distribute
     - ./gradlew distribute publish
 
 after_script:
