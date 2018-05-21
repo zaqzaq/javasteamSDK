@@ -75,24 +75,24 @@ publishWindows:
   tags:
     - windows
   script:
-    - ./gradlew distribute distribute
-    - ./gradlew distribute publish
+    - ./gradlew distribute
+    - ./gradlew publish
 
 publishLinux:
   stage: publish
   tags:
     - ubuntu
   script:
-    - ./gradlew distribute distribute
-    - ./gradlew distribute publish
+    - ./gradlew distribute
+    - ./gradlew publish
 
 publishOsx:
   stage: publish
   tags:
     - osx
   script:
-    - ./gradlew distribute distribute
-    - ./gradlew distribute publish
+    - ./gradlew distribute
+    - ./gradlew publish
 
 after_script:
   - echo "End CI"
