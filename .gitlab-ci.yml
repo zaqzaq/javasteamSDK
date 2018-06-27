@@ -22,6 +22,7 @@ buildWindows:
     - windows
   script:
     - ./gradlew assemble
+    - git clone git@gitlab.nimblygames.com:NimblyGames/core.git
   artifacts:
     paths:
       - build/libs/*.jar

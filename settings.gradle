@@ -19,5 +19,5 @@ rootProject.name = 'steam'
 
 include 'SteamSdk'
 
-includeFlat 'core'
-project(':core').projectDir = new File('../core')
+includeBuild "../core"
+//project(':core').projectDir = new File('../core')
