@@ -1,8 +1,9 @@
-before_script:
-  - eval $(ssh-agent -s)
-  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
-  - mkdir -p ~/.ssh
-  - chmod 700 ~/.ssh
+#before_script:
+#  - eval $(ssh-agent -s)
+#  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+#  - mkdir -p ~/.ssh
+#  - chmod 700 ~/.ssh
+#  - git clone git@gitlab.nimblygames.com:NimblyGames/core.git
 
 stages:
   - wake
@@ -27,7 +28,6 @@ buildWindows:
     - windows
   script:
     - ./gradlew assemble
-    - git clone git@gitlab.nimblygames.com:NimblyGames/core.git
   artifacts:
     paths:
       - build/libs/*.jar
