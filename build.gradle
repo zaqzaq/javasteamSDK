@@ -1,7 +1,7 @@
-//apply from: project(':core').projectDir.getAbsolutePath() + "/build.gradle"
-
 allprojects {
+
 }
+
 ext {
 	// test
 	junitVersion = '4.12'
