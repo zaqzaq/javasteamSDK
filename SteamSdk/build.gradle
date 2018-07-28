@@ -16,6 +16,9 @@ plugins {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+group = 'com.nimblygames'
+version = '1.0.0'
+
 ext {
 	steamSdkDirPath = "${projectDir}/sdk/sdk_135"
 	is64Bit = System.getProperty("os.arch").equals("amd64") || System.getProperty("os.arch").equals("x86_64");
@@ -394,6 +397,10 @@ test {
 
 publishing {
 	publications {
+		steamJar(MavenPublication){
+			artifact jar
+		}
+
 		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
 			steamjnix86Publish(MavenPublication) {
 				groupId 'com.nimblygames'
