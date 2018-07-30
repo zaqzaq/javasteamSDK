@@ -1,3 +1,27 @@
+pluginManagement{
+	repositories {
+		maven {
+			url 'https://artifactory.nimblygames.com/artifactory/gradle-release-local/'
+			credentials {
+				username getProperty("artifactory_user")
+				password getProperty("artifactory_password")
+			}
+		}
+
+		gradlePluginPortal()
+		jcenter()
+	}
+
+
+	resolutionStrategy{
+		eachPlugin{
+			if (requested.id.id == 'com.nimblygames.gradle') {
+				useModule('com.nimblygames:GradlePlugin:1.0.0')
+			}
+		}
+	}
+}
+
 rootProject.name = 'steam'
 
 include 'SteamSdk'
