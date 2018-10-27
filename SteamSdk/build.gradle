@@ -298,7 +298,7 @@ model {
 					// compiler osx
 					if (targetPlatform.operatingSystem.isMacOsX()) {
 						cppCompiler.args '-I'
-						File javaHome = getJvm().getJavaHome()
+						String javaHome = Jvm.current().getJavaHome().absoluatePath
 						logger.error("javaHome=" + javaHome)
 						cppCompiler.args "$javaHome/include"
 					}
