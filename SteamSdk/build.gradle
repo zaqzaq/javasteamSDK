@@ -9,6 +9,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
+import org.gradle.internal.jvm.Jvm
 
 import static com.nimblygames.gradle.NgLibrariesKt.*
 
@@ -66,7 +67,7 @@ task nativeHeaders(dependsOn: [
 	doLast {
 		outputDirectory.parentFile.mkdirs()
 		exec {
-			executable org.gradle.internal.jvm.Jvm.current().getExecutable('javah')
+			executable Jvm.current().getExecutable('javah')
 			args '-d', outputDirectory
 			args '-classpath', sourceSets.main.output.classesDirs.asPath
 			args classes
@@ -298,14 +299,17 @@ model {
 					// compiler osx
 					if (targetPlatform.operatingSystem.isMacOsX()) {
 						cppCompiler.args '-I'
-						String javaHome = Jvm.current().getJavaHome().absoluatePath
+						String javaHome = Jvm.current().getJavaHome().getAbsolutePath();
 						logger.error("javaHome=" + javaHome)
 						cppCompiler.args "$javaHome/include"
+						cppCompiler.args "-I"
+						cppCompiler.args "$javaHome/include/darwin"
 					}
 
 					// linker osx
 					if (targetPlatform.operatingSystem.isMacOsX()) {
 						linker.args '-dynamiclib'
+						linker.args '-lsteam_api'
 					}
 					if (targetPlatform.getName().equals("osx32")) {
 						linker.args "-L${steamSdkDirPath}/redistributable_bin/osx32"
