@@ -2,14 +2,15 @@
  * Copyright (c) 2018 Nimbly Games, LLC all rights reserved
  */
 
+
 import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.internal.jvm.Jvm
 
 import java.nio.ByteBuffer
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
-import org.gradle.internal.jvm.Jvm
 
 import static com.nimblygames.gradle.NgLibrariesKt.*
 
@@ -299,7 +300,7 @@ model {
 					// compiler osx
 					if (targetPlatform.operatingSystem.isMacOsX()) {
 						cppCompiler.args '-I'
-						String javaHome = Jvm.current().getJavaHome().getAbsolutePath();
+						String javaHome = Jvm.current().getJavaHome().getAbsolutePath()
 						logger.error("javaHome=" + javaHome)
 						cppCompiler.args "$javaHome/include"
 						cppCompiler.args "-I"

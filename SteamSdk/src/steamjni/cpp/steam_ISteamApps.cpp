@@ -42,7 +42,7 @@ JNIEXPORT jboolean JNICALL Java_steam_ISteamApps_nBIsVACBanned(JNIEnv* env, jcla
 
 JNIEXPORT jstring JNICALL Java_steam_ISteamApps_nGetCurrentGameLanguage(JNIEnv* env, jclass callingClass) {
 	if (SteamApps() == 0) {
-		return false;
+		return 0;
 	}
 	steamjni::SteamCallbackClass::log(env, "GetCurrentGameLanguages is not implemented");
 	return 0;
@@ -50,7 +50,7 @@ JNIEXPORT jstring JNICALL Java_steam_ISteamApps_nGetCurrentGameLanguage(JNIEnv* 
 
 JNIEXPORT jstring JNICALL Java_steam_ISteamApps_nGetAvailableGameLanguages(JNIEnv* env, jclass callingClass) {
 	if (SteamApps() == 0) {
-		return false;
+		return 0;
 	}
 	steamjni::SteamCallbackClass::log(env, "GetAvailableGameLanguages is not implemented");
 	return 0;
@@ -58,7 +58,7 @@ JNIEXPORT jstring JNICALL Java_steam_ISteamApps_nGetAvailableGameLanguages(JNIEn
 
 JNIEXPORT jboolean JNICALL Java_steam_ISteamApps_nBIsSubscribedApp(JNIEnv* env, jclass callingClass, jlong appId) {
 	if (SteamApps() == 0) {
-		return 0;
+		return false;
 	}
 	return SteamApps()->BIsSubscribedApp(appId);
 }
@@ -72,7 +72,7 @@ JNIEXPORT jboolean JNICALL Java_steam_ISteamApps_nBIsDlcInstalled(JNIEnv* env, j
 
 JNIEXPORT jlong JNICALL Java_steam_ISteamApps_nGetEarliestPurchaseUnixTime(JNIEnv* env, jclass callingClass, jlong appId) {
 	if (SteamApps() == 0) {
-		return false;
+		return 0;
 	}
 	return SteamApps()->GetEarliestPurchaseUnixTime(appId);
 }
@@ -86,7 +86,7 @@ JNIEXPORT jboolean JNICALL Java_steam_ISteamApps_nBIsSubscribedFromFreeWeekend(J
 
 JNIEXPORT jint JNICALL Java_steam_ISteamApps_nGetDLCCount(JNIEnv* env, jclass callingClass) {
 	if (SteamApps() == 0) {
-		return false;
+		return 0;
 	}
 	return SteamApps()->GetDLCCount();
 }
@@ -115,7 +115,7 @@ JNIEXPORT void JNICALL Java_steam_ISteamApps_nUninstallDLC(JNIEnv* env, jclass c
 
 JNIEXPORT jstring JNICALL Java_steam_ISteamApps_nGetCurrentBetaName(JNIEnv* env, jclass callingClass) {
 	if (SteamApps() == 0) {
-		return false;
+		return 0;
 	}
 	const int pchNameLength = 128;
 	char pchName[pchNameLength];
@@ -144,7 +144,7 @@ JNIEXPORT jint JNICALL Java_steam_ISteamApps_nGetInstalledDepots(JNIEnv* env, jc
 
 JNIEXPORT jstring JNICALL Java_steam_ISteamApps_nGetAppInstallDir(JNIEnv* env, jclass callingClass, jlong appId) {
 	if (SteamApps() == 0) {
-		return false;
+		return 0;
 	}
 	const int pchFolderLength = 512;
 	char pchFolder[pchFolderLength];
@@ -161,7 +161,7 @@ JNIEXPORT jboolean JNICALL Java_steam_ISteamApps_nBIsAppInstalled(JNIEnv* env, j
 
 JNIEXPORT jlong JNICALL Java_steam_ISteamApps_nGetAppOwner(JNIEnv* env, jclass callingClass) {
 	if (SteamApps() == 0) {
-		return false;
+		return 0;
 	}
 	CSteamID steamId = SteamApps()->GetAppOwner();
 	uint64 steamIdUint = steamId.ConvertToUint64();
@@ -170,7 +170,7 @@ JNIEXPORT jlong JNICALL Java_steam_ISteamApps_nGetAppOwner(JNIEnv* env, jclass c
 
 JNIEXPORT jint JNICALL Java_steam_ISteamApps_nGetAppBuildId(JNIEnv* env, jclass callingClass) {
 	if (SteamApps() == 0) {
-		return false;
+		return 0;
 	}
 	return SteamApps()->GetAppBuildId();
 }
