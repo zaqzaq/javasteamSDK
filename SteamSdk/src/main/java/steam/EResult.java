@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 Nimbly Games, LLC all rights reserved
+ */
+
 package steam;
 
 import java.util.HashMap;
@@ -66,7 +70,8 @@ public enum EResult {
 			}
 		}
 		public final int intValue;
-		private EResult(int intValue){
+
+   EResult(int intValue) {
 			this.intValue = intValue;
 		}
 }

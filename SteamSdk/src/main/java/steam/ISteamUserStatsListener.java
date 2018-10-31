@@ -1,9 +1,13 @@
+/*
+ * Copyright (c) 2018 Nimbly Games, LLC all rights reserved
+ */
+
 package steam;
 
 public interface ISteamUserStatsListener {
-	public void OnLeaderboardScoresDownloaded(LeaderboardScoresDownloaded_t pParam, boolean ioFailure);
+   void OnLeaderboardScoresDownloaded(LeaderboardScoresDownloaded_t pParam, boolean ioFailure);
 
-	public void OnFindLeaderboard(LeaderboardFindResult_t pFindLeaderboardResult, boolean bIOFailure);
+   void OnFindLeaderboard(LeaderboardFindResult_t pFindLeaderboardResult, boolean bIOFailure);
 
-	public void OnUploadScore(LeaderboardScoreUploaded_t pScoreUploadedResult, boolean bIOFailure);
+   void OnUploadScore(LeaderboardScoreUploaded_t pScoreUploadedResult, boolean bIOFailure);
 }

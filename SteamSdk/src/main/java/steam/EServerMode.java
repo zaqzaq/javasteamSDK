@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 Nimbly Games, LLC all rights reserved
+ */
+
 package steam;
 
 public enum EServerMode {
@@ -7,7 +11,8 @@ public enum EServerMode {
 	eServerModeAuthenticationAndSecure(3);
 	
 	public final int toInt;
-	private EServerMode(int mode){
+
+   EServerMode(int mode) {
 		this.toInt = mode;
 	}
 }

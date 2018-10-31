@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 Nimbly Games, LLC all rights reserved
+ */
+
 package steam;
 
 public class ControllerHandle_t {
@@ -31,11 +35,8 @@ public class ControllerHandle_t {
 			return false;
 		}
 		ControllerHandle_t other = (ControllerHandle_t) obj;
-		if (controllerHandle != other.controllerHandle) {
-			return false;
-		}
-		return true;
-	}
+      return controllerHandle == other.controllerHandle;
+   }
 
 	public String toString() {
 		return "ControllerHandle_t [controllerHandle=" + controllerHandle + "]";

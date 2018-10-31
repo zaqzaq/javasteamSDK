@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 Nimbly Games, LLC all rights reserved
+ */
+
 package steam;
 
 import java.util.HashMap;
@@ -27,7 +31,8 @@ public enum EDenyReason {
 		}
 	}
 	public final int intValue;
-	private EDenyReason(int intValue){
+
+   EDenyReason(int intValue) {
 		this.intValue = intValue;
 	}
 }

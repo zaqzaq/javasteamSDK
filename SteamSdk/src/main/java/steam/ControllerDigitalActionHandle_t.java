@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 Nimbly Games, LLC all rights reserved
+ */
+
 package steam;
 
 public class ControllerDigitalActionHandle_t {
@@ -31,11 +35,8 @@ public class ControllerDigitalActionHandle_t {
 			return false;
 		}
 		ControllerDigitalActionHandle_t other = (ControllerDigitalActionHandle_t) obj;
-		if (controllerDigitalActionHandle != other.controllerDigitalActionHandle) {
-			return false;
-		}
-		return true;
-	}
+      return controllerDigitalActionHandle == other.controllerDigitalActionHandle;
+   }
 
 	public String toString() {
 		return "ControllerDigitalActionHandle_t [controllerDigitalActionHandle=" + controllerDigitalActionHandle + "]";

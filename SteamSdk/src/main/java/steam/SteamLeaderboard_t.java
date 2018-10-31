@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 Nimbly Games, LLC all rights reserved
+ */
+
 package steam;
 
 public class SteamLeaderboard_t {
@@ -31,10 +35,8 @@ public class SteamLeaderboard_t {
 		if (getClass() != obj.getClass())
 			return false;
 		SteamLeaderboard_t other = (SteamLeaderboard_t) obj;
-		if (steamLeaderboard_t != other.steamLeaderboard_t)
-			return false;
-		return true;
-	}
+      return steamLeaderboard_t == other.steamLeaderboard_t;
+   }
 	
 	
 }

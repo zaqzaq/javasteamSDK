@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 Nimbly Games, LLC all rights reserved
+ */
+
 package steam;
 
 
@@ -49,8 +53,6 @@ public class CSteamID {
 		if (getClass() != obj.getClass())
 			return false;
 		CSteamID other = (CSteamID) obj;
-		if (uint64 != other.uint64)
-			return false;
-		return true;
-	}
+      return uint64 == other.uint64;
+   }
 }

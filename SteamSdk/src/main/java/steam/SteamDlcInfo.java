@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2018 Nimbly Games, LLC all rights reserved
+ */
+
 package steam;
 
 public class SteamDlcInfo {
@@ -50,13 +54,8 @@ public class SteamDlcInfo {
 		if (available != other.available) {
 			return false;
 		}
-		if (name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!name.equals(other.name)) {
-			return false;
-		}
-		return true;
-	}
+      if (name == null) {
+         return other.name == null;
+      } else { return name.equals(other.name); }
+   }
 }
