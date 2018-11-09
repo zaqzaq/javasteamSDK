@@ -30,6 +30,8 @@ version = '1.0.0'
 ext {
 	steamSdkDirPath = "${projectDir}/sdk/sdk_135"
 	is64Bit = System.getProperty("os.arch").equals("amd64") || System.getProperty("os.arch").equals("x86_64")
+	javaHomePathString = Jvm.current().getJavaHome().getAbsolutePath()
+	logger.error("javaHomePathString=" + javaHomePathString)
 }
 
 repositories { jcenter() }
@@ -201,8 +203,8 @@ model {
 					cppCompiler.args '/EHs'
 					cppCompiler.args '/MT'
 					cppCompiler.args '/nologo'
-					cppCompiler.args "/IC:/Program Files/Java/jdk6/include"
-					cppCompiler.args "/IC:/Program Files/Java/jdk6/include/win32"
+					cppCompiler.args "/I${javaHomePathString}/include"
+					cppCompiler.args "/I${javaHomePathString}/include/win32"
 					cppCompiler.args "/I${steamSdkDirPath}/public"
 
 					linker.args '/nologo'
@@ -300,11 +302,9 @@ model {
 					// compiler osx
 					if (targetPlatform.operatingSystem.isMacOsX()) {
 						cppCompiler.args '-I'
-						String javaHome = Jvm.current().getJavaHome().getAbsolutePath()
-						logger.error("javaHome=" + javaHome)
-						cppCompiler.args "$javaHome/include"
+						cppCompiler.args "$javaHomePathString/include"
 						cppCompiler.args "-I"
-						cppCompiler.args "$javaHome/include/darwin"
+						cppCompiler.args "$javaHomePathString/include/darwin"
 					}
 
 					// linker osx
