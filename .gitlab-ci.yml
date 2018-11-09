@@ -6,28 +6,18 @@
 #  - git clone git@gitlab.nimblygames.com:NimblyGames/core.git
 
 stages:
-  - wake
   - build
   - wake
   - test
   - wake
   - publish
 
-wake:
-  stage: wake
-  tags:
-    - ubuntu
-  script:
-    - wakeonlan 10:9A:DD:51:F5:11
-    - wakeonlan 70:85:C2:59:37:97
-    - sleep 5s
-
 buildWindows:
   stage: build
   tags:
     - windows
   script:
-    - gradlew assemble
+    - .\gradlew -i --no-build-cache clean assemble
   artifacts:
     paths:
       - build/libs/*.jar
@@ -38,7 +28,7 @@ buildLinux:
   tags:
     - ubuntu
   script:
-    - sh ./gradlew assemble
+    ./gradlew -i --no-build-cache clean assemble
   artifacts:
     paths:
       - build/libs/*.jar
@@ -49,7 +39,7 @@ buildOsx:
   tags:
     - osx
   script:
-    - sh ./gradlew assemble
+    ./gradlew -i --no-build-cache clean assemble
   artifacts:
     paths:
       - build/libs/*.jar
@@ -67,14 +57,14 @@ testLinux:
   tags:
     - ubuntu
   script:
-    - sh ./gradlew -i check
+    - ./gradlew -i check
 
 testOsx:
   stage: test
   tags:
     - osx
   script:
-    - sh ./gradlew -i check
+    - ./gradlew -i check
 
 publishWindows:
   stage: publish
@@ -89,16 +79,16 @@ publishLinux:
   tags:
     - ubuntu
   script:
-    - sh ./gradlew distribute
-    - sh ./gradlew publish
+    - ./gradlew distribute
+    - ./gradlew publish
 
 publishOsx:
   stage: publish
   tags:
     - osx
   script:
-    - sh ./gradlew distribute
-    - sh ./gradlew publish
+    - ./gradlew distribute
+    - ./gradlew publish
 
 after_script:
   - echo "End CI"
