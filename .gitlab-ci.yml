@@ -27,7 +27,7 @@ buildWindows:
   tags:
     - windows
   script:
-    - ./gradlew assemble
+    - gradlew assemble
   artifacts:
     paths:
       - build/libs/*.jar
@@ -38,7 +38,7 @@ buildLinux:
   tags:
     - ubuntu
   script:
-    - ./gradlew assemble
+    - sh ./gradlew assemble
   artifacts:
     paths:
       - build/libs/*.jar
@@ -49,7 +49,7 @@ buildOsx:
   tags:
     - osx
   script:
-    - ./gradlew assemble
+    - sh ./gradlew assemble
   artifacts:
     paths:
       - build/libs/*.jar
@@ -67,14 +67,14 @@ testLinux:
   tags:
     - ubuntu
   script:
-    - ./gradlew -i check
+    - sh ./gradlew -i check
 
 testOsx:
   stage: test
   tags:
     - osx
   script:
-    - ./gradlew -i check
+    - sh ./gradlew -i check
 
 publishWindows:
   stage: publish
@@ -89,16 +89,16 @@ publishLinux:
   tags:
     - ubuntu
   script:
-    - ./gradlew distribute
-    - ./gradlew publish
+    - sh ./gradlew distribute
+    - sh ./gradlew publish
 
 publishOsx:
   stage: publish
   tags:
     - osx
   script:
-    - ./gradlew distribute
-    - ./gradlew publish
+    - sh ./gradlew distribute
+    - sh ./gradlew publish
 
 after_script:
   - echo "End CI"
