@@ -7,9 +7,7 @@
 
 stages:
   - build
-  - wake
   - test
-  - wake
   - publish
 
 buildWindows:
@@ -50,45 +48,45 @@ testWindows:
   tags:
     - windows
   script:
-    - ./gradlew -i check
+    - ./gradlew -i --no-build-cache clean check
 
 testLinux:
   stage: test
   tags:
     - ubuntu
   script:
-    - ./gradlew -i check
+    - ./gradlew -i --no-build-cache clean check
 
 testOsx:
   stage: test
   tags:
     - osx
   script:
-    - ./gradlew -i check
+    - ./gradlew -i --no-build-cache cleancheck
 
 publishWindows:
   stage: publish
   tags:
     - windows
   script:
-    - ./gradlew distribute
-    - ./gradlew publish
+    - ./gradlew -i --no-build-cache clean distribute
+    - ./gradlew -i --no-build-cache publish
 
 publishLinux:
   stage: publish
   tags:
     - ubuntu
   script:
-    - ./gradlew distribute
-    - ./gradlew publish
+    - ./gradlew -i --no-build-cache clean distribute
+    - ./gradlew -i --no-build-cache publish
 
 publishOsx:
   stage: publish
   tags:
     - osx
   script:
-    - ./gradlew distribute
-    - ./gradlew publish
+    - ./gradlew -i --no-build-cache clean distribute
+    - ./gradlew -i --no-build-cache publish
 
 after_script:
   - echo "End CI"
