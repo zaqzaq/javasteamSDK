@@ -62,7 +62,7 @@ testOsx:
   tags:
     - osx
   script:
-    - ./gradlew -i --no-build-cache cleancheck
+    - ./gradlew -i --no-build-cache clean check
 
 publishWindows:
   stage: publish
