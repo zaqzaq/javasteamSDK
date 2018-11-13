@@ -7,7 +7,7 @@
 
 stages:
   - build
-#  - test
+  - test
   - publish
 
 buildWindows:
@@ -43,26 +43,26 @@ buildOsx:
       - build/libs/*.jar
     expire_in: 1 week
 
-#testWindows:
-#  stage: test
-#  tags:
-#    - windows
-#  script:
-#    - ./gradlew -i --no-build-cache clean check
-#
-#testLinux:
-#  stage: test
-#  tags:
-#    - ubuntu
-#  script:
-#    - ./gradlew -i --no-build-cache clean check
-#
-#testOsx:
-#  stage: test
-#  tags:
-#    - osx
-#  script:
-#    - ./gradlew -i --no-build-cache clean check
+testWindows:
+  stage: test
+  tags:
+    - windows
+  script:
+    - ./gradlew -i --no-build-cache clean check
+
+testLinux:
+  stage: test
+  tags:
+    - ubuntu
+  script:
+    - ./gradlew -i --no-build-cache clean check
+
+testOsx:
+  stage: test
+  tags:
+    - osx
+  script:
+    - ./gradlew -i --no-build-cache clean check
 
 publishWindows:
   stage: publish
