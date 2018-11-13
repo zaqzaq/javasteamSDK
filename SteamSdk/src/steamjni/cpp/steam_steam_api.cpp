@@ -64,7 +64,9 @@ JNIEXPORT void JNICALL Java_steam_steam_1api_nSteamAPI_1Init(JNIEnv *env, jclass
 
 	steamjni::SteamCallbackClass::log(env, "Going to call SteamAPI_Init");
 	bool inited = SteamAPI_Init();
-	steamjni::SteamCallbackClass::log(env, "SteamAPI_Init finished");
+	sstream.clear();
+	sstream << "SteamAPI_Init = " << inited;
+	steamjni::SteamCallbackClass::log(env, sstream.str().c_str());
 	if ( !inited ) {
 		jclass MyOwnException = env->FindClass("steam/exception/SteamException");
 		if(MyOwnException!=0){
