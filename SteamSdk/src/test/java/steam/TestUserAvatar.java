@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Nimbly Games, LLC all rights reserved
+ * Copyright (c) 2019 Nimbly Games, LLC all rights reserved
  */
 
 package steam;
@@ -26,7 +26,7 @@ public class TestUserAvatar extends TestCase {
 	protected void setUp() throws Exception {
 		try {
 			LOG.info("setUp: initializing Steam.");
-			steam_api.loadNativeLibrariesFromDir(new File("build/dist"));
+			steam_api.loadNativeLibrariesIntoDir(new File("build/dist"));
 			steam_api.SteamAPI_Init(steam_apiTest.STEAM_APP_ID_TEST);
 			callbackThread = startRunCallbackThread();
 		} catch (final Exception ex) {

@@ -1,7 +1,0 @@
-/*
- * Copyright (c) 2018 Nimbly Games, LLC all rights reserved
- */
-
-plugins{
-	id("com.nimblygames.gradle")
-}
