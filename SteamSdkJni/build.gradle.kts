@@ -35,7 +35,7 @@ logger.error("javaHomePathString=" + javaHomePathString)
 
 val macOsDylibLipo = tasks.register<Exec>("macOsDylibLipo") {
    val outputLibName = "lib${project.name}.dylib"
-   workingDir = File(buildDir, "distribute");
+   workingDir = File(buildDir, "distribute")
    val outputLibFile = File(workingDir, outputLibName)
    outputs.file(outputLibFile)
    executable = "lipo"
@@ -85,7 +85,7 @@ library {
                              machines.linux.x86_64,
                              machines.macOS.x86,
                              machines.macOS.x86_64))
-   logger.error("Set targetMachines to ${targetMachines.get()}");
+   logger.error("Set targetMachines to ${targetMachines.get()}")
 
    toolChains.forEach { toolChain ->
       if (toolChain is VisualCpp) {
@@ -184,18 +184,16 @@ library {
          }
 
 // linker shared
-         binaryLinkTask.lib("steam_api")
+         
 
 // linker linux
          if (targetPlatform.targetMachine.architecture.name == MachineArchitecture.X86) {
             println("platform is linux32")
-            binaryLinkTask.linkerArgs.add("-L")
-            binaryLinkTask.linkerArgs.add("$steamSdkDirPath/redistributable_bin/linux32")
+            binaryLinkTask.lib("$steamSdkDirPath/redistributable_bin/linux32/libsteam_api.so")
          }
          if (targetMachine.architecture.name == MachineArchitecture.X86_64) {
             println("platform is linux64")
-            binaryLinkTask.linkerArgs.add("-L")
-            binaryLinkTask.linkerArgs.add("$steamSdkDirPath/redistributable_bin/linux64")
+            binaryLinkTask.lib("$steamSdkDirPath/redistributable_bin/linux64/libsteam_api.so")
          }
 
 // linker osx
@@ -242,7 +240,7 @@ library {
                                      if (targetMachine.architecture.name == MachineArchitecture.X86) {
                                         args("i386")
                                      } else if (targetMachine.architecture.name == MachineArchitecture.X86_64) {
-                                        args("x86_64");
+                                        args("x86_64")
                                      }
                                      args("$binaryFile")
                                   })
@@ -257,7 +255,7 @@ library {
             }
 
             destinationDirectory.set(file("$buildDir/distribute"))
-            archiveFileName.set("SteamSdkJni-$osName.jar");
+            archiveFileName.set("SteamSdkJni-$osName.jar")
             currentPlatformNativePublication.artifactId = archiveFileName.get()
 
             if (targetMachine.operatingSystemFamily.isMacOs) {
