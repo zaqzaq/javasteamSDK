@@ -218,9 +218,7 @@ library {
 
 // linker osx
          if (targetMachine.operatingSystemFamily.isMacOs) {
-//            binaryLinkTask.linkerArgs.add("-dynamiclib")
-            binaryLinkTask.lib("steam_api")
-            binaryLinkTask.linkerArgs.add("-L$steamSdkDirPath/redistributable_bin/osx32")
+            binaryLinkTask.lib("$steamSdkDirPath/redistributable_bin/osx32/libsteam_api.dylib")
          }
       }
 
@@ -252,6 +250,7 @@ library {
 
             if (targetMachine.operatingSystemFamily.isMacOs) {
                dependsOn(macOsDylibLipo)
+               logger.error("added dependency on macOsDylibLipo")
             }
 
             destinationDirectory.set(file("$buildDir/distribute"))
@@ -261,7 +260,9 @@ library {
             if (targetMachine.operatingSystemFamily.isMacOs) {
                if (!inputs.files.contains(macOsDylibLipo.get().outputs.files.single())) {
                   logger.error("Adding macOS dylib to current platform jar ${macOsDylibLipo.get().outputs.files.single()}")
-                  inputs.file(macOsDylibLipo.get().outputs.files.single())
+                  from(macOsDylibLipo.get().outputs.files.single()){
+                     into("$osName")
+                  }
                }
             } else {
                binaryLinkTask.outputs.files.forEach {
