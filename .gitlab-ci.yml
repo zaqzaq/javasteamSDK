@@ -69,7 +69,6 @@ publishWindows:
   tags:
     - windows
   script:
-    - ./gradlew -i --no-build-cache distribute
     - ./gradlew -i --no-build-cache publish
 
 publishLinux:
@@ -77,7 +76,6 @@ publishLinux:
   tags:
     - ubuntu
   script:
-    - ./gradlew -i --no-build-cache distribute
     - ./gradlew -i --no-build-cache publish
 
 publishOsx:
@@ -85,7 +83,6 @@ publishOsx:
   tags:
     - osx
   script:
-    - ./gradlew -i --no-build-cache distribute
     - ./gradlew -i --no-build-cache publish
 
 after_script:
