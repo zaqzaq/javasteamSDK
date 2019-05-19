@@ -28,7 +28,7 @@ dependencies {
    steamSdkJniHeaders.get()(project(":SteamSdk", "jniHeaders"))
 }
 
-val steamSdkDirPath = "${projectDir}/sdk/sdk_135"
+val steamSdkDirPath = "${projectDir}/sdk/sdk_144"
 val is64Bit = System.getProperty("os.arch").equals("amd64") || System.getProperty("os.arch").equals("x86_64")
 val javaHomePathString = Jvm.current().getJavaHome().getAbsolutePath()
 logger.error("javaHomePathString=" + javaHomePathString)
@@ -226,7 +226,7 @@ library {
          if (targetMachine.operatingSystemFamily.isMacOs) {
             macOsDylibLipo.configure {
                dependsOn(binaryLinkTask)
-               
+
                binaryLinkTask.outputs.files.files
                        .stream()
                        .filter({ file -> file.name.endsWith(".dylib") })

@@ -159,8 +159,8 @@ JNIEXPORT jint JNICALL Java_steam_ISteamRemoteStorage_nGetQuotaTotalBytes(JNIEnv
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nGetQuotaTotalBytes: Could not initialize SteamAPI. Steam must be running to call this method.");
 		return false;
 	}
-	int32 totalBytes = 0;
-	int32 availBytes = 0;
+	uint64 totalBytes = 0;
+	uint64 availBytes = 0;
 	bool returnFromSteam = SteamRemoteStorage()->GetQuota(&totalBytes, &availBytes);
 	if(returnFromSteam == false){
 		totalBytes = 0;
@@ -175,8 +175,8 @@ JNIEXPORT jint JNICALL Java_steam_ISteamRemoteStorage_nGetQuotaAvailableBytes(JN
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nGetQuotaAvailableBytes: Could not initialize SteamAPI. Steam must be running to call this method.");
 		return false;
 	}
-	int32 totalBytes = 0;
-	int32 availBytes = 0;
+	uint64 totalBytes = 0;
+	uint64 availBytes = 0;
 	bool returnFromSteam = SteamRemoteStorage()->GetQuota(&totalBytes, &availBytes);
 	if(returnFromSteam == false){
 		totalBytes = 0;
