@@ -180,6 +180,7 @@ library {
 
 // compiler osx
          if (targetPlatform.targetMachine.operatingSystemFamily.isMacOs) {
+            binaryCompileTask.compilerArgs.add("-std=c++11")
             binaryCompileTask.includes(file("/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers"))
          }
 
@@ -214,6 +215,7 @@ library {
          if (targetMachine.operatingSystemFamily.isMacOs) {
             binaryCompileTask.includes(file("$javaHomePathString/include"))
             binaryCompileTask.includes(file("$javaHomePathString/include/darwin"))
+            binaryCompileTask.compilerArgs.add("-std=c++11")
          }
 
 // linker osx
