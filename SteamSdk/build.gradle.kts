@@ -47,6 +47,10 @@ val is64Bit = System.getProperty("os.arch") == "amd64" || System.getProperty("os
 val javaHomePathString: String = Jvm.current().javaHome.absolutePath
 logger.error("javaHomePathString=$javaHomePathString")
 
+tasks.withType(Test::class.java){
+   maxParallelForks = 1
+}
+
 // generate headers
 // fixme enable caching
 val nativeHeaders = tasks.register("nativeHeaders") {

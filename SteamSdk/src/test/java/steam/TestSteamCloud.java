@@ -19,20 +19,16 @@ import java.util.Arrays;
 public class TestSteamCloud extends TestCase {
 	private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-	private static Thread callbackThread;
-
 	@Override
 	protected void setUp() throws Exception {
 		LOG.info("setUp: initializing Steam.");
 		steam_api.loadNativeLibrariesIntoDir(new File("build/dist"));
 		steam_api.SteamAPI_Init(steam_apiTest.STEAM_APP_ID_TEST);
-		callbackThread = startRunCallbackThread();
 	}
 
 	@Override
 	@SuppressWarnings("deprecation")
 	protected void tearDown() throws Exception {
-		callbackThread.stop();
 		steam_api.SteamAPI_Shutdown();
 	}
 
@@ -116,21 +112,4 @@ public class TestSteamCloud extends TestCase {
 
 		ISteamRemoteStorage.FileDelete(fileName);
 	}
-
-	private static Thread startRunCallbackThread() {
-		final Thread thread = new Thread(() -> {
-			while (true) {
-				steam_api.SteamAPI_RunCallbacks();
-				try {
-					Thread.sleep(50);
-				} catch (final InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		thread.setDaemon(true);
-		thread.start();
-		return thread;
-	}
-
 }
