@@ -55,7 +55,7 @@ public class steam_api {
             throw new IllegalStateException("Failed to find shared library " + relativeUriString + ". It was not found on the classpath.");
          }
          Path sharedLibraryRealPath = dir.resolve(sharedLibraryRelativePath).toAbsolutePath();
-         Files.createDirectories(sharedLibraryRealPath);
+         Files.createDirectories(sharedLibraryRealPath.getParent());
          Files.copy(sharedLibraryResourceStream, sharedLibraryRealPath, StandardCopyOption.REPLACE_EXISTING);
       }
 
