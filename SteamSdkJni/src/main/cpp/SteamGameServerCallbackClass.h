@@ -18,7 +18,7 @@ class SteamGameServerCallbackClass {
 		JavaVM *jvm;
 		void log(const char* theString);
 	public:
-		SteamGameServerCallbackClass(JavaVM *jvm);
+		explicit SteamGameServerCallbackClass(JavaVM *jvm);
 		virtual ~SteamGameServerCallbackClass();
 		//
 		// Various callback functions that Steam will call to let us know about events related to our

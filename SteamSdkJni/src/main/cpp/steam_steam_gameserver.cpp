@@ -13,13 +13,13 @@ extern "C" void __cdecl SteamGameServerAPIDebugTextHook( int nSeverity, const ch
 	std::cout << pchDebugText << std::endl;
 }
 
-steamjni::SteamGameServerCallbackClass *steamGameServerCallback = 0;
+steamjni::SteamGameServerCallbackClass *steamGameServerCallback = nullptr;
 
 JNIEXPORT jboolean JNICALL Java_steam_steam_1gameserver_nSteamGameServer_1Init
   (JNIEnv *env, jclass javaClass, jint unIP, jint usPort, jint usGamePort, jint usSpectatorPort, jint usQueryPort, jint eServerMode, jstring pchGameDir, jstring pchVersionString){
-	  JavaVM *jvm = 0;
+	  JavaVM *jvm = nullptr;
 	  env->GetJavaVM(&jvm);
-	  if(jvm!=0){
+	  if(jvm!=nullptr){
 	 	steamGameServerCallback = new steamjni::SteamGameServerCallbackClass(jvm);
 	  }else{
 		cerr << "NATIVE: Failed to get JVM pointer" << endl;
@@ -27,21 +27,21 @@ JNIEXPORT jboolean JNICALL Java_steam_steam_1gameserver_nSteamGameServer_1Init
 
 	  const char *nativePchGameDir = "game dir";
 	  const char *nativePchVersionString = "0.0.0";
-	  if(pchGameDir!=NULL){
-		nativePchGameDir = env->GetStringUTFChars(pchGameDir, 0);
+	  if(pchGameDir!=nullptr){
+		nativePchGameDir = env->GetStringUTFChars(pchGameDir, nullptr);
 	  }
-	  if(pchVersionString!=NULL){
-		nativePchVersionString = env->GetStringUTFChars(pchVersionString, 0);
+	  if(pchVersionString!=nullptr){
+		nativePchVersionString = env->GetStringUTFChars(pchVersionString, nullptr);
 	  }
 	  bool returnValue = SteamGameServer_Init(unIP, (uint16)usPort, (uint16)usGamePort, (uint16)usQueryPort, (EServerMode)eServerMode, nativePchVersionString);
-	  if(pchGameDir!=NULL){
+	  if(pchGameDir!=nullptr){
 		env->ReleaseStringUTFChars(pchGameDir, nativePchGameDir);
 	  }
-	  if(pchVersionString!=NULL){
+	  if(pchVersionString!=nullptr){
 		env->ReleaseStringUTFChars(pchVersionString, nativePchVersionString);
 	  }
 
-	  if(SteamUtils()!=NULL){
+	  if(SteamUtils()!=nullptr){
 		  SteamUtils()->SetWarningMessageHook( &SteamGameServerAPIDebugTextHook );
 	  }
 
@@ -51,9 +51,9 @@ JNIEXPORT jboolean JNICALL Java_steam_steam_1gameserver_nSteamGameServer_1Init
 JNIEXPORT void JNICALL Java_steam_steam_1gameserver_SteamGameServer_1Shutdown
 (JNIEnv *env, jclass javaClass){
 	SteamGameServer_Shutdown();
-	if(steamGameServerCallback!=0){
+	if(steamGameServerCallback!=nullptr){
 		delete(steamGameServerCallback);
-		steamGameServerCallback = 0;
+		steamGameServerCallback = nullptr;
 	}
 }
 

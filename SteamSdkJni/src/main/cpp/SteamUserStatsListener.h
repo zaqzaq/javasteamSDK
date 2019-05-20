@@ -29,7 +29,7 @@ class SteamUserStatsListener {
 		std::vector<CCallResult<SteamUserStatsListener, LeaderboardFindResult_t>*> findLeaderboardVector;
 		std::vector<CCallResult<SteamUserStatsListener, LeaderboardScoreUploaded_t>*> uploadScoreVector;
 
-		static void throwException(JNIEnv * env, char * str);
+		static void throwException(JNIEnv * env, const char * str);
 		static void log(JNIEnv *env, const char* theString);
 		static void log(JavaVM *jvm, const char* theString);
 		virtual ~SteamUserStatsListener();

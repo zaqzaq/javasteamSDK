@@ -7,9 +7,9 @@ using steamjni::SteamUserStatsListener;
 
 JNIEXPORT jlong JNICALL Java_steam_SteamUserStatsListener_nInitializeCppCallback
   (JNIEnv *env, jobject callbackClass){
-	JavaVM *jvm = 0;
+	JavaVM *jvm = nullptr;
 	env->GetJavaVM(&jvm);
-	SteamUserStatsListener* listener = new SteamUserStatsListener(jvm, callbackClass);
+	auto* listener = new SteamUserStatsListener(jvm, callbackClass);
 	return reinterpret_cast<jlong>(listener);
 }
 
@@ -22,8 +22,8 @@ JNIEXPORT jlong JNICALL Java_steam_SteamUserStatsListener_nInitializeCppCallback
 
 JNIEXPORT void JNICALL Java_steam_SteamUserStatsListener_nFreeCppCallback
   (JNIEnv *, jobject, jlong cppPointer){
-	SteamUserStatsListener* listener = reinterpret_cast<SteamUserStatsListener*>(cppPointer);
-	if(listener != 0){
+	auto* listener = reinterpret_cast<SteamUserStatsListener*>(cppPointer);
+	if(listener != nullptr){
 		delete(listener);
 	}
 }

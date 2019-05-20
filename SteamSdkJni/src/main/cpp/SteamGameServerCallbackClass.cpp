@@ -27,7 +27,7 @@ SteamGameServerCallbackClass::SteamGameServerCallbackClass(JavaVM *jvm):
 	this->jvm = jvm;
 }
 
-SteamGameServerCallbackClass::~SteamGameServerCallbackClass() {}
+SteamGameServerCallbackClass::~SteamGameServerCallbackClass() = default;
 
 void SteamGameServerCallbackClass::log(const char* theString){
 	steamjni::SteamCallbackClass::log(this->jvm, theString);
@@ -37,17 +37,17 @@ void SteamGameServerCallbackClass::log(const char* theString){
 // Purpose: Take any action we need to on Steam notifying us we are now logged in
 //-----------------------------------------------------------------------------
 void SteamGameServerCallbackClass::OnSteamServersConnected( SteamServersConnected_t *pLogonSuccess ) {
-	if(pLogonSuccess==NULL){
+	if(pLogonSuccess==nullptr){
 		log("OnSteamServersConnected was passed null");
 		return;
 	}
 
 	JNIEnv *env;
-	this->jvm->AttachCurrentThread((void **) &env, NULL);
+	this->jvm->AttachCurrentThread((void **) &env, nullptr);
 
 	jclass iSteamGameServerClass = env->FindClass("steam/ISteamGameServer");
 	jmethodID callBackMethodID = env->GetStaticMethodID(iSteamGameServerClass, "OnSteamServersConnected", "(I)V");
-	if(callBackMethodID==0){
+	if(callBackMethodID==nullptr){
 		ostringstream errorString;
 		errorString << "Could not find java method OnSteamServersConnected(I)V" << std::endl;
 		log(&errorString.str()[0]);
@@ -63,7 +63,7 @@ void SteamGameServerCallbackClass::OnSteamServersConnected( SteamServersConnecte
 // Purpose: Callback from Steam3 when logon is fully completed and VAC secure policy is set
 //-----------------------------------------------------------------------------
 void SteamGameServerCallbackClass::OnPolicyResponse( GSPolicyResponse_t *pPolicyResponse ){
-	if(pPolicyResponse==NULL){
+	if(pPolicyResponse==nullptr){
 		log("OnPolicyResponse was passed null");
 		return;
 	}
@@ -72,17 +72,18 @@ void SteamGameServerCallbackClass::OnPolicyResponse( GSPolicyResponse_t *pPolicy
 //	nativeStringBuffer << "GSPolicyResponse_t result=" << pPolicyResponse;
 //	steamjni::SteamCallbackClass::log(this->jvm,&nativeStringBuffer.str()[0]);
 	JNIEnv *env;
-	this->jvm->AttachCurrentThread((void **) &env, NULL);
+	this->jvm->AttachCurrentThread((void **) &env, nullptr);
 
 	jclass iSteamGameServerClass = env->FindClass("steam/ISteamGameServer");
 	jmethodID callBackMethodID = env->GetStaticMethodID(iSteamGameServerClass, "OnPolicyResponse", "(IZ)V");
-	if(callBackMethodID==0){
+	if(callBackMethodID==nullptr){
 		ostringstream errorString;
 		errorString << "Could not find java method OnPolicyResponse(IZ)V" << std::endl;
 		log(&errorString.str()[0]);
 		return;
 	}
-	env->CallStaticVoidMethod(iSteamGameServerClass, callBackMethodID, (jint)pPolicyResponse->k_iCallback, (jboolean)pPolicyResponse->m_bSecure==0?false:true);
+	env->CallStaticVoidMethod(iSteamGameServerClass, callBackMethodID, (jint)pPolicyResponse->k_iCallback,
+                              (jboolean) pPolicyResponse->m_bSecure != 0);
 
 	this->jvm->DetachCurrentThread();
 }
@@ -92,7 +93,7 @@ void SteamGameServerCallbackClass::OnPolicyResponse( GSPolicyResponse_t *pPolicy
 // Purpose: Called when we were previously logged into steam but get logged out
 //-----------------------------------------------------------------------------
 void SteamGameServerCallbackClass::OnSteamServersDisconnected( SteamServersDisconnected_t *pLoggedOff ){
-	if(pLoggedOff==NULL){
+	if(pLoggedOff==nullptr){
 		log("OnSteamServersDisconnected was passed null");
 		return;
 	}
@@ -101,11 +102,11 @@ void SteamGameServerCallbackClass::OnSteamServersDisconnected( SteamServersDisco
 //	nativeStringBuffer << "SteamServersDisconnected_t result=" << pLoggedOff;
 //	steamjni::SteamCallbackClass::log(this->jvm,&nativeStringBuffer.str()[0]);
 	JNIEnv *env;
-	this->jvm->AttachCurrentThread((void **) &env, NULL);
+	this->jvm->AttachCurrentThread((void **) &env, nullptr);
 
 	jclass iSteamGameServerClass = env->FindClass("steam/ISteamGameServer");
 	jmethodID callBackMethodID = env->GetStaticMethodID(iSteamGameServerClass, "OnSteamServersDisconnected", "(II)V");
-	if(callBackMethodID==0){
+	if(callBackMethodID==nullptr){
 		ostringstream errorString;
 		errorString << "Could not find java method OnSteamServersDisconnected(II)V" << std::endl;
 		log(&errorString.str()[0]);
@@ -120,7 +121,7 @@ void SteamGameServerCallbackClass::OnSteamServersDisconnected( SteamServersDisco
 // Purpose: Tells us Steam3 (VAC and newer license checking) has accepted the user connection
 //-----------------------------------------------------------------------------
 void SteamGameServerCallbackClass::OnGSClientApprove( GSClientApprove_t *pGSClientApprove ){
-	if(pGSClientApprove==NULL){
+	if(pGSClientApprove==nullptr){
 		log("OnGSClientApprove was passed null");
 		return;
 	}
@@ -131,11 +132,11 @@ void SteamGameServerCallbackClass::OnGSClientApprove( GSClientApprove_t *pGSClie
 //	steamjni::SteamCallbackClass::log(this->jvm,&nativeStringBuffer.str()[0]);
 
 	JNIEnv *env;
-	this->jvm->AttachCurrentThread((void **) &env, NULL);
+	this->jvm->AttachCurrentThread((void **) &env, nullptr);
 
 	jclass iSteamGameServerClass = env->FindClass("steam/ISteamGameServer");
 	jmethodID callBackMethodID = env->GetStaticMethodID(iSteamGameServerClass, "OnGSClientApprove", "(IJ)V");
-	if(callBackMethodID==0){
+	if(callBackMethodID==nullptr){
 		ostringstream errorString;
 		errorString << "Could not find java method OnGSClientApprove(IJ)V" << std::endl;
 		log(&errorString.str()[0]);
@@ -151,7 +152,7 @@ void SteamGameServerCallbackClass::OnGSClientApprove( GSClientApprove_t *pGSClie
 // Purpose: Callback indicating that Steam has told us to deny a user connection
 //-----------------------------------------------------------------------------
 void SteamGameServerCallbackClass::OnGSClientDeny( GSClientDeny_t *pGSClientDeny ){
-	if(pGSClientDeny==NULL){
+	if(pGSClientDeny==nullptr){
 		log("OnGSClientDeny was passed null");
 		return;
 	}
@@ -161,11 +162,11 @@ void SteamGameServerCallbackClass::OnGSClientDeny( GSClientDeny_t *pGSClientDeny
 //	steamjni::SteamCallbackClass::log(this->jvm,&nativeStringBuffer.str()[0]);
 
 	JNIEnv *env;
-	this->jvm->AttachCurrentThread((void **) &env, NULL);
+	this->jvm->AttachCurrentThread((void **) &env, nullptr);
 	jstring optionalString = env->NewStringUTF(pGSClientDeny->m_rgchOptionalText);
 	jclass iSteamGameServerClass = env->FindClass("steam/ISteamGameServer");
 	jmethodID callBackMethodID = env->GetStaticMethodID(iSteamGameServerClass, "OnGSClientDeny", "(IILjava/lang/String;J)V");
-	if(callBackMethodID==0){
+	if(callBackMethodID==nullptr){
 		ostringstream errorString;
 		errorString << "Could not find java method OnGSClientDeny(IILjava/lang/String;J)V" << std::endl;
 		log(&errorString.str()[0]);
@@ -183,7 +184,7 @@ void SteamGameServerCallbackClass::OnGSClientDeny( GSClientDeny_t *pGSClientDeny
 // Steam and now VAC can't verify them...)
 //-----------------------------------------------------------------------------
 void SteamGameServerCallbackClass::OnGSClientKick( GSClientKick_t *pGSClientKick ){
-	if(pGSClientKick==NULL){
+	if(pGSClientKick==nullptr){
 		log("OnGSClientKick was passed null");
 		return;
 	}
@@ -193,11 +194,11 @@ void SteamGameServerCallbackClass::OnGSClientKick( GSClientKick_t *pGSClientKick
 //	steamjni::SteamCallbackClass::log(this->jvm,&nativeStringBuffer.str()[0]);
 
 	JNIEnv *env;
-	this->jvm->AttachCurrentThread((void **) &env, NULL);
+	this->jvm->AttachCurrentThread((void **) &env, nullptr);
 
 	jclass iSteamGameServerClass = env->FindClass("steam/ISteamGameServer");
 	jmethodID callBackMethodID = env->GetStaticMethodID(iSteamGameServerClass, "OnGSClientKick", "(IIJ)V");
-	if(callBackMethodID==0){
+	if(callBackMethodID==nullptr){
 		ostringstream errorString;
 		errorString << "Could not find java method OnGSClientKick(IIJ)V" << std::endl;
 		log(&errorString.str()[0]);
@@ -212,7 +213,7 @@ void SteamGameServerCallbackClass::OnGSClientKick( GSClientKick_t *pGSClientKick
 // Purpose: Handle clients connecting
 //-----------------------------------------------------------------------------
 void SteamGameServerCallbackClass::OnP2PSessionRequest( P2PSessionRequest_t *pCallback ){
-	if(pCallback==NULL){
+	if(pCallback==nullptr){
 		log("OnP2PSessionRequest was passed null");
 		return;
 	}
@@ -222,11 +223,11 @@ void SteamGameServerCallbackClass::OnP2PSessionRequest( P2PSessionRequest_t *pCa
 //	steamjni::SteamCallbackClass::log(this->jvm,&nativeStringBuffer.str()[0]);
 
 	JNIEnv *env;
-	this->jvm->AttachCurrentThread((void **) &env, NULL);
+	this->jvm->AttachCurrentThread((void **) &env, nullptr);
 
 	jclass iSteamGameServerClass = env->FindClass("steam/ISteamGameServer");
 	jmethodID callBackMethodID = env->GetStaticMethodID(iSteamGameServerClass, "OnP2PSessionRequest", "(IJ)V");
-	if(callBackMethodID==0){
+	if(callBackMethodID==nullptr){
 		ostringstream errorString;
 		errorString << "Could not find java method OnP2PSessionRequest(IJ)V" << std::endl;
 		log(&errorString.str()[0]);
@@ -240,7 +241,7 @@ void SteamGameServerCallbackClass::OnP2PSessionRequest( P2PSessionRequest_t *pCa
 // Purpose: Handle clients disconnecting
 //-----------------------------------------------------------------------------
 void SteamGameServerCallbackClass::OnP2PSessionConnectFail( P2PSessionConnectFail_t *pCallback ){
-	if(pCallback==NULL){
+	if(pCallback==nullptr){
 		log("OnP2PSessionConnectFail was passed null");
 		return;
 	}
@@ -250,11 +251,11 @@ void SteamGameServerCallbackClass::OnP2PSessionConnectFail( P2PSessionConnectFai
 //	steamjni::SteamCallbackClass::log(this->jvm,&nativeStringBuffer.str()[0]);
 
 	JNIEnv *env;
-	this->jvm->AttachCurrentThread((void **) &env, NULL);
+	this->jvm->AttachCurrentThread((void **) &env, nullptr);
 
 	jclass iSteamGameServerClass = env->FindClass("steam/ISteamGameServer");
 	jmethodID callBackMethodID = env->GetStaticMethodID(iSteamGameServerClass, "OnP2PSessionConnectFail", "(IIJ)V");
-	if(callBackMethodID==0){
+	if(callBackMethodID==nullptr){
 		ostringstream errorString;
 		errorString << "Could not find java method OnP2PSessionConnectFail(IIJ)V" << std::endl;
 		log(&errorString.str()[0]);

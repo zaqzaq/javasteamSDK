@@ -33,9 +33,9 @@ extern "C" void __cdecl ngSteamAPIWarningMessageHook_t(int nSeverity, const char
 }
 
 JNIEXPORT void JNICALL Java_steam_steam_1api_nSteamAPI_1Init(JNIEnv *env, jclass javaClass, jlong steamAppId) {
-	JavaVM *jvm = 0;
+	JavaVM *jvm = nullptr;
 	env->GetJavaVM(&jvm);
-	if(jvm!=0){
+	if(jvm!=nullptr){
 		steamjni::SteamCallbackClass::createInstance(jvm);
 	}else{
 		cerr << "NATIVE: Failed to get JVM pointer" << endl;
@@ -69,7 +69,7 @@ JNIEXPORT void JNICALL Java_steam_steam_1api_nSteamAPI_1Init(JNIEnv *env, jclass
 	steamjni::SteamCallbackClass::log(env, sstream.str().c_str());
 	if ( !inited ) {
 		jclass MyOwnException = env->FindClass("steam/exception/SteamException");
-		if(MyOwnException!=0){
+		if(MyOwnException!=nullptr){
 			env->ThrowNew(MyOwnException,"Could not initialize SteamAPI. Steam must be running to call this method.");
 			return;
 		}else{

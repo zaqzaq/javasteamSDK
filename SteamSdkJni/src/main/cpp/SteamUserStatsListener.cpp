@@ -82,7 +82,7 @@ namespace steamjni {
         }
     }
 
-    void SteamUserStatsListener::throwException(JNIEnv *env, char *str) {
+    void SteamUserStatsListener::throwException(JNIEnv *env, const char *str) {
         jclass MyOwnException = env->FindClass("steam/exception/SteamException");
         if (MyOwnException != nullptr) {
             env->ThrowNew(MyOwnException, str);

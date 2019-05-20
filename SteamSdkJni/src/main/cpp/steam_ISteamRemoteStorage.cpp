@@ -13,14 +13,14 @@
 using steamjni::SteamCallbackClass;
 
 JNIEXPORT jboolean JNICALL Java_steam_ISteamRemoteStorage_nFileWrite(JNIEnv * env, jclass javaClass, jstring pchString, jobject pvData){
-	if(SteamRemoteStorage() == 0){
+	if(SteamRemoteStorage() == nullptr){
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nFileWrite: Could not initialize SteamAPI. Steam must be running to call this method.");
 		return false;
 	}
 	jboolean isCopy = false;
 	const char * pchStringCpp = env->GetStringUTFChars(pchString, &isCopy);
 	char * pvDataCpp = (char *)env->GetDirectBufferAddress(pvData);
-	if(pvDataCpp == 0){
+	if(pvDataCpp == nullptr){
 		SteamCallbackClass::throwException(env, "Failed to get address of direct byte buffer");
 	}
 	int pvDataCppSize = env->GetDirectBufferCapacity(pvData);
@@ -38,14 +38,14 @@ JNIEXPORT jboolean JNICALL Java_steam_ISteamRemoteStorage_nFileWrite(JNIEnv * en
 }
 
 JNIEXPORT jint JNICALL Java_steam_ISteamRemoteStorage_nFileRead(JNIEnv * env, jclass javaClass, jstring pchString, jobject pvData){
-	if(SteamRemoteStorage() == 0){
+	if(SteamRemoteStorage() == nullptr){
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nFileRead: Could not initialize SteamAPI. Steam must be running to call this method.");
 		return false;
 	}
 	jboolean isCopy = false;
 	const char * pchStringCpp = env->GetStringUTFChars(pchString, &isCopy);
 	char * pvDataCpp = (char *)env->GetDirectBufferAddress(pvData);
-	if(pvDataCpp == 0){
+	if(pvDataCpp == nullptr){
 		SteamCallbackClass::throwException(env, "Failed to get address of direct byte buffer");
 	}
 	int pvDataCppSize = env->GetDirectBufferCapacity(pvData);
@@ -58,7 +58,7 @@ JNIEXPORT jint JNICALL Java_steam_ISteamRemoteStorage_nFileRead(JNIEnv * env, jc
 }
 
 JNIEXPORT jboolean JNICALL Java_steam_ISteamRemoteStorage_nFileForget(JNIEnv * env, jclass javaClass, jstring pchString){
-	if(SteamRemoteStorage() == 0){
+	if(SteamRemoteStorage() == nullptr){
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nFileRead: Could not initialize SteamAPI. Steam must be running to call this method.");
 		return false;
 	}
@@ -73,7 +73,7 @@ JNIEXPORT jboolean JNICALL Java_steam_ISteamRemoteStorage_nFileForget(JNIEnv * e
 }
 
 JNIEXPORT jboolean JNICALL Java_steam_ISteamRemoteStorage_nFileDelete(JNIEnv * env, jclass javaClass, jstring pchString){
-	if(SteamRemoteStorage() == 0){
+	if(SteamRemoteStorage() == nullptr){
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nFileRead: Could not initialize SteamAPI. Steam must be running to call this method.");
 		return false;
 	}
@@ -88,17 +88,17 @@ JNIEXPORT jboolean JNICALL Java_steam_ISteamRemoteStorage_nFileDelete(JNIEnv * e
 }
 
 JNIEXPORT jboolean JNICALL Java_steam_ISteamRemoteStorage_nFileExists(JNIEnv * env, jclass javaClass, jstring pchString){
-	if(SteamRemoteStorage() == 0){
+	if(SteamRemoteStorage() == nullptr){
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nFileExists: Could not initialize SteamAPI. Steam must be running to call this method.");
 		return false;
 	}
-	if(pchString == 0){
+	if(pchString == nullptr){
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nFileExists: pchString cannot be null.");
 		return false;
 	}
 	jboolean isCopy = false;
 	const char * pchStringCpp = env->GetStringUTFChars(pchString, &isCopy);
-	if(pchStringCpp == 0){
+	if(pchStringCpp == nullptr){
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nFileExists: Couldn't get UTFChars of pchString");
 		return false;
 	}
@@ -110,7 +110,7 @@ JNIEXPORT jboolean JNICALL Java_steam_ISteamRemoteStorage_nFileExists(JNIEnv * e
 }
 
 JNIEXPORT jboolean JNICALL Java_steam_ISteamRemoteStorage_nFilePersisted(JNIEnv * env, jclass javaClass, jstring pchString){
-	if(SteamRemoteStorage() == 0){
+	if(SteamRemoteStorage() == nullptr){
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nFilePersisted: Could not initialize SteamAPI. Steam must be running to call this method.");
 		return false;
 	}
@@ -125,7 +125,7 @@ JNIEXPORT jboolean JNICALL Java_steam_ISteamRemoteStorage_nFilePersisted(JNIEnv 
 }
 
 JNIEXPORT jint JNICALL Java_steam_ISteamRemoteStorage_nGetFileSize(JNIEnv * env, jclass javaClass, jstring pchString){
-	if(SteamRemoteStorage() == 0){
+	if(SteamRemoteStorage() == nullptr){
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nGetFileSize: Could not initialize SteamAPI. Steam must be running to call this method.");
 		return false;
 	}
@@ -140,7 +140,7 @@ JNIEXPORT jint JNICALL Java_steam_ISteamRemoteStorage_nGetFileSize(JNIEnv * env,
 }
 
 JNIEXPORT jlong JNICALL Java_steam_ISteamRemoteStorage_nGetFileTimestamp(JNIEnv * env, jclass javaClass, jstring pchString){
-	if(SteamRemoteStorage() == 0){
+	if(SteamRemoteStorage() == nullptr){
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nGetFileTimestamp: Could not initialize SteamAPI. Steam must be running to call this method.");
 		return false;
 	}
@@ -155,14 +155,14 @@ JNIEXPORT jlong JNICALL Java_steam_ISteamRemoteStorage_nGetFileTimestamp(JNIEnv 
 }
 
 JNIEXPORT jint JNICALL Java_steam_ISteamRemoteStorage_nGetQuotaTotalBytes(JNIEnv * env, jclass javaClass){
-	if(SteamRemoteStorage() == 0){
+	if(SteamRemoteStorage() == nullptr){
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nGetQuotaTotalBytes: Could not initialize SteamAPI. Steam must be running to call this method.");
 		return false;
 	}
 	uint64 totalBytes = 0;
 	uint64 availBytes = 0;
 	bool returnFromSteam = SteamRemoteStorage()->GetQuota(&totalBytes, &availBytes);
-	if(returnFromSteam == false){
+	if(!returnFromSteam){
 		totalBytes = 0;
 		availBytes = 0;
 	}
@@ -171,14 +171,14 @@ JNIEXPORT jint JNICALL Java_steam_ISteamRemoteStorage_nGetQuotaTotalBytes(JNIEnv
 }
 
 JNIEXPORT jint JNICALL Java_steam_ISteamRemoteStorage_nGetQuotaAvailableBytes(JNIEnv * env, jclass javaClass){
-	if(SteamRemoteStorage() == 0){
+	if(SteamRemoteStorage() == nullptr){
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nGetQuotaAvailableBytes: Could not initialize SteamAPI. Steam must be running to call this method.");
 		return false;
 	}
 	uint64 totalBytes = 0;
 	uint64 availBytes = 0;
 	bool returnFromSteam = SteamRemoteStorage()->GetQuota(&totalBytes, &availBytes);
-	if(returnFromSteam == false){
+	if(!returnFromSteam){
 		totalBytes = 0;
 		availBytes = 0;
 	}
@@ -187,7 +187,7 @@ JNIEXPORT jint JNICALL Java_steam_ISteamRemoteStorage_nGetQuotaAvailableBytes(JN
 }
 
 JNIEXPORT jboolean JNICALL Java_steam_ISteamRemoteStorage_nIsCloudEnabledForAccount(JNIEnv * env, jclass javaClass){
-	if(SteamRemoteStorage() == 0){
+	if(SteamRemoteStorage() == nullptr){
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nIsCloudEnabledForAccount: Could not initialize SteamAPI. Steam must be running to call this method.");
 		return false;
 	}
@@ -197,7 +197,7 @@ JNIEXPORT jboolean JNICALL Java_steam_ISteamRemoteStorage_nIsCloudEnabledForAcco
 }
 
 JNIEXPORT jboolean JNICALL Java_steam_ISteamRemoteStorage_nIsCloudEnabledForApp(JNIEnv * env, jclass javaClass){
-	if(SteamRemoteStorage() == 0){
+	if(SteamRemoteStorage() == nullptr){
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nIsCloudEnabledForApp: Could not initialize SteamAPI. Steam must be running to call this method.");
 		return false;
 	}
@@ -207,7 +207,7 @@ JNIEXPORT jboolean JNICALL Java_steam_ISteamRemoteStorage_nIsCloudEnabledForApp(
 }
 
 JNIEXPORT jint JNICALL Java_steam_ISteamRemoteStorage_nGetFileCount(JNIEnv * env, jclass callingClass){
-	if(SteamRemoteStorage() == 0){
+	if(SteamRemoteStorage() == nullptr){
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nGetFileCount: Could not initialize SteamAPI. Steam must be running to call this method.");
 		return false;
 	}
@@ -215,25 +215,25 @@ JNIEXPORT jint JNICALL Java_steam_ISteamRemoteStorage_nGetFileCount(JNIEnv * env
 }
 
 JNIEXPORT jobject JNICALL Java_steam_ISteamRemoteStorage_nGetFileNameAndSize(JNIEnv * env, jclass callingClass, jint iFile){
-	if(SteamRemoteStorage() == 0){
+	if(SteamRemoteStorage() == nullptr){
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamRemoteStorage_nGetFileNameAndSize: Could not initialize SteamAPI. Steam must be running to call this method.");
-		return 0;
+		return nullptr;
 	}
 
 	int32 pnFileSizeInBytes = 0;
 	const char * fileName = SteamRemoteStorage()->GetFileNameAndSize(iFile, &pnFileSizeInBytes);
 
-	if(fileName == 0){
-		return 0;
+	if(fileName == nullptr){
+		return nullptr;
 	}
 
 	jstring fileNameJava = env->NewStringUTF(fileName);
 	jint fileSizeJava = pnFileSizeInBytes;
 
 	jclass steamFileHolderClass = env->FindClass("steam/SteamFileNameAndSize");
-	if(steamFileHolderClass == 0){
+	if(steamFileHolderClass == nullptr){
 		SteamCallbackClass::throwException(env, "Couldn't find class steam/SteamFileNameAndSize");
-		return 0;
+		return nullptr;
 	}
 	jmethodID constructor = env->GetMethodID(steamFileHolderClass, "<init>", "(Ljava/lang/String;I)V");
 	jobject fileHolder = env->NewObject(steamFileHolderClass, constructor, fileNameJava, fileSizeJava);

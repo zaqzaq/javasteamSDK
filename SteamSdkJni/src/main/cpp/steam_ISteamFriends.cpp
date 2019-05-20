@@ -12,7 +12,7 @@ using steamjni::SteamCallbackClass;
 JNIEXPORT jstring JNICALL Java_steam_ISteamFriends_nGetPersonaName
   (JNIEnv *env, jclass){
 	ISteamFriends* steamFriends = SteamFriends();
-	if(steamFriends==0){
+	if(steamFriends==nullptr){
 		return env->NewStringUTF("");
 	}
     const char* personaName = steamFriends->GetPersonaName();
@@ -22,7 +22,7 @@ JNIEXPORT jstring JNICALL Java_steam_ISteamFriends_nGetPersonaName
 JNIEXPORT jint JNICALL Java_steam_ISteamFriends_nGetFriendCount
   (JNIEnv *, jclass, jint flag){
 	ISteamFriends* steamFriends = SteamFriends();
-	if(steamFriends==0){
+	if(steamFriends==nullptr){
 		return (jint)0;
 	}
 	return (jint)steamFriends->GetFriendCount((int)flag);
@@ -31,7 +31,7 @@ JNIEXPORT jint JNICALL Java_steam_ISteamFriends_nGetFriendCount
 JNIEXPORT jlong JNICALL Java_steam_ISteamFriends_nGetFriendByIndex
   (JNIEnv *, jclass, jint iFriend, jint flag){
 	ISteamFriends* steamFriends = SteamFriends();
-	if(steamFriends==0){
+	if(steamFriends==nullptr){
 		return (jlong)0;
 	}
 	return (jlong)steamFriends->GetFriendByIndex((int)iFriend, (int)flag).ConvertToUint64();
@@ -40,7 +40,7 @@ JNIEXPORT jlong JNICALL Java_steam_ISteamFriends_nGetFriendByIndex
 JNIEXPORT jstring JNICALL Java_steam_ISteamFriends_nGetFriendPersonaName
 (JNIEnv *env, jclass, jlong ulSteamID){
 	ISteamFriends* steamFriends = SteamFriends();
-	if(steamFriends==0){
+	if(steamFriends==nullptr){
 		return env->NewStringUTF("");
 	}
 	CSteamID steamIDFriend((uint64)ulSteamID);
@@ -51,7 +51,7 @@ JNIEXPORT jstring JNICALL Java_steam_ISteamFriends_nGetFriendPersonaName
 JNIEXPORT jint JNICALL Java_steam_ISteamFriends_nGetClanCount
 (JNIEnv *, jclass){
 	ISteamFriends* steamFriends = SteamFriends();
-	if(steamFriends==0){
+	if(steamFriends==nullptr){
 		return (jint)0;
 	}
 	return (jint)steamFriends->GetClanCount();
@@ -60,7 +60,7 @@ JNIEXPORT jint JNICALL Java_steam_ISteamFriends_nGetClanCount
 JNIEXPORT jlong JNICALL Java_steam_ISteamFriends_nGetClanByIndex
 (JNIEnv *, jclass, jint iClan){
 	ISteamFriends* steamFriends = SteamFriends();
-	if(steamFriends==0){
+	if(steamFriends==nullptr){
 		return (jlong)0;
 	}
 	return (jlong)steamFriends->GetClanByIndex((int)iClan).ConvertToUint64();
@@ -69,7 +69,7 @@ JNIEXPORT jlong JNICALL Java_steam_ISteamFriends_nGetClanByIndex
 JNIEXPORT jstring JNICALL Java_steam_ISteamFriends_nGetClanName
 (JNIEnv *env, jclass, jlong ulSteamID){
 	ISteamFriends* steamFriends = SteamFriends();
-	if(steamFriends==0){
+	if(steamFriends==nullptr){
 		return env->NewStringUTF("");
 	}
 	CSteamID steamIDClan((uint64)ulSteamID);
@@ -78,7 +78,7 @@ JNIEXPORT jstring JNICALL Java_steam_ISteamFriends_nGetClanName
 }
 
 JNIEXPORT jint JNICALL Java_steam_ISteamFriends_nGetSmallFriendAvatar(JNIEnv * env, jclass callingClass, jlong steamID){
-	if(SteamFriends()==0){
+	if(SteamFriends()==nullptr){
 		SteamCallbackClass::throwException(env, "Java_steam_ISteamFriends_nGetSmallFriendAvatar: SteamFriends() is null");
 		return 0;
 	}
