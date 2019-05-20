@@ -42,17 +42,11 @@ dependencies {
    runtime("org.apache.logging.log4j:log4j-core:$log4jVersion")
 }
 
-val steamSdkDirPath = "$projectDir/sdk/sdk_135"
-val is64Bit = System.getProperty("os.arch") == "amd64" || System.getProperty("os.arch") == "x86_64"
-val javaHomePathString: String = Jvm.current().javaHome.absolutePath
-logger.error("javaHomePathString=$javaHomePathString")
-
 tasks.withType(Test::class.java){
    maxParallelForks = 1
 }
 
 // generate headers
-// fixme enable caching
 val nativeHeaders = tasks.register("nativeHeaders") {
    dependsOn("classes")
    val outputDirectory = file("$buildDir/steamjni/cpp")
