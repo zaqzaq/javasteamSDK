@@ -20,7 +20,7 @@ class SteamCallbackClass {
 	private:
 		JavaVM *jvm;
 		void log(const char* theString);
-		SteamCallbackClass(JavaVM *jvm);
+		explicit SteamCallbackClass(JavaVM *jvm);
 		static std::unique_ptr<SteamCallbackClass> instance;
 	public:
 		std::vector<CCallResult<SteamCallbackClass, LeaderboardScoresDownloaded_t>*> leaderboardScoresDownloadedVector;
