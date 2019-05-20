@@ -34,6 +34,7 @@ dependencies {
    // test
    testImplementation("junit:junit:$junitVersion")
 
+   // karlfixme need to depend on all os types, windows, linux, macos
    testRuntimeOnly(project(":SteamSdkJni", "currentPlatformNativeJar"))
 
    // logging

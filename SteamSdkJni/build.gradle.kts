@@ -26,8 +26,8 @@ dependencies {
 }
 
 val steamSdkDirPath = "${projectDir}/sdk/sdk_144"
-val is64Bit = System.getProperty("os.arch").equals("amd64") || System.getProperty("os.arch").equals("x86_64")
-val javaHomePathString = Jvm.current().getJavaHome().getAbsolutePath()
+val is64Bit = System.getProperty("os.arch") == "amd64" || System.getProperty("os.arch") == "x86_64"
+val javaHomePathString: String = Jvm.current().javaHome.absolutePath
 
 val macOsDylibLipo = tasks.register<Exec>("macOsDylibLipo") {
     val outputLibName = "lib${project.name}.dylib"
@@ -40,6 +40,9 @@ val macOsDylibLipo = tasks.register<Exec>("macOsDylibLipo") {
     args(outputLibName)
 }
 
+/*
+ * karlfixme need to make jar for windows, macos, and linux and register them for each os.
+ */
 val currentPlatformNativeJar = tasks.register<Jar>("currentPlatformNativeJar")
 
 artifacts {
@@ -238,7 +241,7 @@ library {
                 if (targetMachine.operatingSystemFamily.isMacOs) {
                     if (!inputs.files.contains(macOsDylibLipo.get().outputs.files.single())) {
                         from(macOsDylibLipo.get().outputs.files.single()) {
-                            into("$osName")
+                            into(osName)
                         }
                     }
                 } else {
