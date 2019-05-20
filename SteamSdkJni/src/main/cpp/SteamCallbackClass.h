@@ -21,13 +21,13 @@ class SteamCallbackClass {
 		JavaVM *jvm;
 		void log(const char* theString);
 		SteamCallbackClass(JavaVM *jvm);
-		static std::auto_ptr<SteamCallbackClass> instance;
+		static std::unique_ptr<SteamCallbackClass> instance;
 	public:
 		std::vector<CCallResult<SteamCallbackClass, LeaderboardScoresDownloaded_t>*> leaderboardScoresDownloadedVector;
 		std::vector<CCallResult<SteamCallbackClass, LeaderboardFindResult_t>*> findLeaderboardVector;
 		std::vector<CCallResult<SteamCallbackClass, LeaderboardScoreUploaded_t>*> uploadScoreVector;
 
-		static void throwException(JNIEnv * env, char * str);
+		static void throwException(JNIEnv * env, const char * str);
 		static void log(JNIEnv *env, const char* theString);
 		static void log(JavaVM *jvm, const char* theString);
 		static SteamCallbackClass * createInstance(JavaVM * jvm);
