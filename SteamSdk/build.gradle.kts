@@ -34,8 +34,9 @@ dependencies {
    // test
    testImplementation("junit:junit:$junitVersion")
 
-   // karlfixme need to depend on all os types, windows, linux, macos
-   testRuntimeOnly(project(":SteamSdkJni", "currentPlatformNativeJar"))
+   testRuntimeOnly(project(":SteamSdkJni", "windowsPlatformNativeJar"))
+   testRuntimeOnly(project(":SteamSdkJni", "linuxPlatformNativeJar"))
+   testRuntimeOnly(project(":SteamSdkJni", "macOsPlatformNativeJar"))
 
    // logging
    implementation("org.slf4j:slf4j-api:$slf4jVersion")
@@ -43,7 +44,7 @@ dependencies {
    runtime("org.apache.logging.log4j:log4j-core:$log4jVersion")
 }
 
-tasks.withType(Test::class.java){
+tasks.withType(Test::class.java) {
    maxParallelForks = 1
 }
 
@@ -96,12 +97,12 @@ val nativeHeaders = tasks.register("nativeHeaders") {
             try {
                inputChannel = Files.newByteChannel(path, StandardOpenOption.READ)
                outputFile =
-                       File(path.toFile().absoluteFile.parentFile, "${path.fileName}lf")
+                     File(path.toFile().absoluteFile.parentFile, "${path.fileName}lf")
                outputChannel =
-                       Files.newByteChannel(outputFile.toPath(),
-                                            StandardOpenOption.CREATE,
-                                            StandardOpenOption.TRUNCATE_EXISTING,
-                                            StandardOpenOption.WRITE)
+                     Files.newByteChannel(outputFile.toPath(),
+                                          StandardOpenOption.CREATE,
+                                          StandardOpenOption.TRUNCATE_EXISTING,
+                                          StandardOpenOption.WRITE)
                foundCr = false
 
                val inBuffer = ByteBuffer.allocate(1024)
