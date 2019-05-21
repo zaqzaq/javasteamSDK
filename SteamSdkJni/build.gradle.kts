@@ -121,26 +121,32 @@ library {
 
       val osName = when {
          targetMachine.operatingSystemFamily.isWindows -> {
-            currentPlatformNativePublication.artifact(windowsPlatformNativeJar.get())
-            currentPlatformNativePublication.artifactId = windowsPlatformNativeJar.get().archiveFileName.get()
-            artifacts {
-               add(windowsPlatformConfiguration.name, windowsPlatformNativeJar)
+            if(currentPlatformNativePublication.artifactId != windowsPlatformNativeJar.get().archiveFileName.get()) {
+               currentPlatformNativePublication.artifact(windowsPlatformNativeJar.get())
+               currentPlatformNativePublication.artifactId = windowsPlatformNativeJar.get().archiveFileName.get()
+               artifacts {
+                  add(windowsPlatformConfiguration.name, windowsPlatformNativeJar)
+               }
             }
             OperatingSystemFamily.WINDOWS
          }
          targetMachine.operatingSystemFamily.isMacOs -> {
-            currentPlatformNativePublication.artifact(macOsPlatformNativeJar.get())
-            currentPlatformNativePublication.artifactId = macOsPlatformNativeJar.get().archiveFileName.get()
-            artifacts {
-               add(macOsPlatformConfiguration.name, macOsPlatformNativeJar)
+            if(currentPlatformNativePublication.artifactId != macOsPlatformNativeJar.get().archiveFileName.get()) {
+               currentPlatformNativePublication.artifact(macOsPlatformNativeJar.get())
+               currentPlatformNativePublication.artifactId = macOsPlatformNativeJar.get().archiveFileName.get()
+               artifacts {
+                  add(macOsPlatformConfiguration.name, macOsPlatformNativeJar)
+               }
             }
             OperatingSystemFamily.MACOS
          }
          targetMachine.operatingSystemFamily.isLinux -> {
-            currentPlatformNativePublication.artifact(linuxPlatformNativeJar.get())
-            currentPlatformNativePublication.artifactId = linuxPlatformNativeJar.get().archiveFileName.get()
-            artifacts {
-               add(linuxPlatformConfiguration.name, linuxPlatformNativeJar)
+            if(currentPlatformNativePublication.artifactId != linuxPlatformNativeJar.get().archiveFileName.get()) {
+               currentPlatformNativePublication.artifact(linuxPlatformNativeJar.get())
+               currentPlatformNativePublication.artifactId = linuxPlatformNativeJar.get().archiveFileName.get()
+               artifacts {
+                  add(linuxPlatformConfiguration.name, linuxPlatformNativeJar)
+               }
             }
             OperatingSystemFamily.LINUX
          }
