@@ -12,7 +12,7 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
 
-group = "com.nimblygames.steam"
+group = rootProject.group
 version = rootProject.version
 
 plugins {
@@ -157,4 +157,24 @@ val jniHeaders = tasks.register<Zip>("jniHeaders") {
 
 artifacts {
    add(configurations.register("jniHeaders").name, jniHeaders)
+}
+
+publishing {
+   repositories {
+      maven {
+         url = uri("https://artifactory.nimblygames.com/artifactory/gradle-release-local/")
+         credentials {
+            username = rootProject.findProperty("artifactory_user") as String
+            password = rootProject.findProperty("artifactory_password") as String
+         }
+      }
+   }
+   publications {
+      create<MavenPublication>(project.name) {
+         groupId = project.group as String
+         version = project.version as String
+
+         artifact(tasks.named(JavaPlugin.JAR_TASK_NAME).get())
+      }
+   }
 }

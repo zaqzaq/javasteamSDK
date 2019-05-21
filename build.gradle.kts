@@ -2,6 +2,11 @@
  * Copyright (c) 2019 Nimbly Games, LLC all rights reserved
  */
 
+/*
+ * Copyright (c) 2019 Nimbly Games, LLC all rights reserved
+ */
+
+group = "com.nimblygames.steam"
 version = "1.0.1"
 
 plugins {

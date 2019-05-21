@@ -4,7 +4,7 @@
 
 import org.gradle.internal.jvm.Jvm
 
-group = "com.nimblygames.steamsdkjni"
+group = rootProject.group
 version = rootProject.version
 
 plugins {
@@ -40,9 +40,10 @@ val macOsDylibLipo = tasks.register<Exec>("macOsDylibLipo") {
    args(outputLibName)
 }
 
+val windowsPublishArtifactName = "SteamSdkJni-windows"
 val windowsPlatformNativeJar = tasks.register<Jar>("windowsPlatformNativeJar") {
    destinationDirectory.set(file("$buildDir/distribute"))
-   archiveFileName.set("SteamSdkJni-windows.jar")
+   archiveFileName.set("$windowsPublishArtifactName.jar")
 }
 val windowsPlatformConfiguration = configurations.register(windowsPlatformNativeJar.name)
 windowsPlatformConfiguration.get().apply {
@@ -50,9 +51,10 @@ windowsPlatformConfiguration.get().apply {
    logger.info("Added $name configuration")
 }
 
+val linuxPublishArtifactName = "SteamSdkJni-linux"
 val linuxPlatformNativeJar = tasks.register<Jar>("linuxPlatformNativeJar") {
    destinationDirectory.set(file("$buildDir/distribute"))
-   archiveFileName.set("SteamSdkJni-linux.jar")
+   archiveFileName.set("$linuxPublishArtifactName.jar")
 }
 val linuxPlatformConfiguration = configurations.register(linuxPlatformNativeJar.name)
 linuxPlatformConfiguration.get().apply {
@@ -60,9 +62,10 @@ linuxPlatformConfiguration.get().apply {
    logger.info("Added $name configuration")
 }
 
+val macOsPublishArtifactName = "SteamSdkJni-macos"
 val macOsPlatformNativeJar = tasks.register<Jar>("macOsPlatformNativeJar") {
    destinationDirectory.set(file("$buildDir/distribute"))
-   archiveFileName.set("SteamSdkJni-macos.jar")
+   archiveFileName.set("$macOsPublishArtifactName.jar")
 }
 val macOsPlatformConfiguration = configurations.register(macOsPlatformNativeJar.name)
 macOsPlatformConfiguration.get().apply {
@@ -87,6 +90,7 @@ publishing {
 val currentPlatformNativePublication = publishing.publications.create<MavenPublication>(project.name) {
    groupId = project.group as String
    version = project.version as String
+   artifactId = "replace"
 }
 
 library {
@@ -121,9 +125,9 @@ library {
 
       val osName = when {
          targetMachine.operatingSystemFamily.isWindows -> {
-            if(currentPlatformNativePublication.artifactId != windowsPlatformNativeJar.get().archiveFileName.get()) {
+            if(currentPlatformNativePublication.artifactId == "replace") {
                currentPlatformNativePublication.artifact(windowsPlatformNativeJar.get())
-               currentPlatformNativePublication.artifactId = windowsPlatformNativeJar.get().archiveFileName.get()
+               currentPlatformNativePublication.artifactId = windowsPublishArtifactName
                artifacts {
                   add(windowsPlatformConfiguration.name, windowsPlatformNativeJar)
                }
@@ -131,9 +135,9 @@ library {
             OperatingSystemFamily.WINDOWS
          }
          targetMachine.operatingSystemFamily.isMacOs -> {
-            if(currentPlatformNativePublication.artifactId != macOsPlatformNativeJar.get().archiveFileName.get()) {
+            if(currentPlatformNativePublication.artifactId == "replace") {
                currentPlatformNativePublication.artifact(macOsPlatformNativeJar.get())
-               currentPlatformNativePublication.artifactId = macOsPlatformNativeJar.get().archiveFileName.get()
+               currentPlatformNativePublication.artifactId = macOsPublishArtifactName
                artifacts {
                   add(macOsPlatformConfiguration.name, macOsPlatformNativeJar)
                }
@@ -141,9 +145,9 @@ library {
             OperatingSystemFamily.MACOS
          }
          targetMachine.operatingSystemFamily.isLinux -> {
-            if(currentPlatformNativePublication.artifactId != linuxPlatformNativeJar.get().archiveFileName.get()) {
+            if(currentPlatformNativePublication.artifactId == "replace") {
                currentPlatformNativePublication.artifact(linuxPlatformNativeJar.get())
-               currentPlatformNativePublication.artifactId = linuxPlatformNativeJar.get().archiveFileName.get()
+               currentPlatformNativePublication.artifactId = linuxPublishArtifactName
                artifacts {
                   add(linuxPlatformConfiguration.name, linuxPlatformNativeJar)
                }
