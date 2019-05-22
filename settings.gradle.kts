@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (c) 2018 Nimbly Games, LLC all rights reserved
+ * Copyright (c) 2019 Nimbly Games, LLC all rights reserved
  */
 
 val artifactory_user: String? by settings

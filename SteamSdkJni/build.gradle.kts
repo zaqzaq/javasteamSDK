@@ -26,7 +26,6 @@ dependencies {
 }
 
 val steamSdkDirPath = "$projectDir/sdk/sdk_144"
-val is64Bit = System.getProperty("os.arch") == "amd64" || System.getProperty("os.arch") == "x86_64"
 val javaHomePathString: String = Jvm.current().javaHome.absolutePath
 
 val macOsDylibLipo = tasks.register<Exec>("macOsDylibLipo") {
@@ -176,13 +175,13 @@ library {
          binaryCompileTask.compilerArgs.add("/nologo")
 
          binaryLinkTask.linkerArgs.add("/nologo")
-         if (targetMachine.architecture.name == "x86") {
+         if (targetMachine.architecture.name == MachineArchitecture.X86) {
             binaryLinkTask.linkerArgs.add("/libpath:$steamSdkDirPath/public/steam/lib/win32")
             binaryLinkTask.linkerArgs.add("/libpath:$steamSdkDirPath/redistributable_bin")
             binaryLinkTask.linkerArgs.add("steam_api.lib")
             binaryLinkTask.linkerArgs.add("/MACHINE:X86")
          }
-         if (targetPlatform.targetMachine.architecture.name == "x86-64") {
+         if (targetPlatform.targetMachine.architecture.name == MachineArchitecture.X86_64) {
             binaryLinkTask.linkerArgs.add("/libpath:$steamSdkDirPath/public/steam/lib/win64")
             binaryLinkTask.linkerArgs.add("/libpath:$steamSdkDirPath/redistributable_bin/win64")
             binaryLinkTask.linkerArgs.add("steam_api64.lib")

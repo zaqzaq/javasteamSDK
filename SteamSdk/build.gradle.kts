@@ -34,9 +34,9 @@ dependencies {
    // test
    testImplementation("junit:junit:$junitVersion")
 
-   testRuntimeOnly(project(":SteamSdkJni", "windowsPlatformNativeJar"))
-   testRuntimeOnly(project(":SteamSdkJni", "linuxPlatformNativeJar"))
-   testRuntimeOnly(project(":SteamSdkJni", "macOsPlatformNativeJar"))
+   runtimeOnly(project(":SteamSdkJni", "windowsPlatformNativeJar"))
+   runtimeOnly(project(":SteamSdkJni", "linuxPlatformNativeJar"))
+   runtimeOnly(project(":SteamSdkJni", "macOsPlatformNativeJar"))
 
    // logging
    implementation("org.slf4j:slf4j-api:$slf4jVersion")
