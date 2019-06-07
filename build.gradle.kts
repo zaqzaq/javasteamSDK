@@ -6,8 +6,9 @@
  * Copyright (c) 2019 Nimbly Games, LLC all rights reserved
  */
 
+
 group = "com.nimblygames.steam"
-version = "1.0.1"
+version = "1.0.2"
 
 plugins {
    id("com.nimblygames.gradle")

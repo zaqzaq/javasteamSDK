@@ -2,6 +2,8 @@
  * Copyright (c) 2019 Nimbly Games, LLC all rights reserved
  */
 
+@file:Suppress("UnstableApiUsage")
+
 import org.gradle.internal.jvm.Jvm
 
 group = rootProject.group
@@ -39,11 +41,10 @@ val macOsDylibLipo = tasks.register<Exec>("macOsDylibLipo") {
    args(outputLibName)
 }
 
-// karlfixme these need to be classifiers for exporting w/ composite builds. Right now composite build isn't capable of overriding these.
-val windowsPublishArtifactName = "SteamSdkJni-windows"
 val windowsPlatformNativeJar = tasks.register<Jar>("windowsPlatformNativeJar") {
    destinationDirectory.set(file("$buildDir/distribute"))
-   archiveFileName.set("$windowsPublishArtifactName.jar")
+   archiveFileName.set("${project.name}.jar")
+   archiveClassifier.set("windows")
 }
 val windowsPlatformConfiguration = configurations.register(windowsPlatformNativeJar.name)
 windowsPlatformConfiguration.get().apply {
@@ -51,10 +52,10 @@ windowsPlatformConfiguration.get().apply {
    logger.info("Added $name configuration")
 }
 
-val linuxPublishArtifactName = "SteamSdkJni-linux"
 val linuxPlatformNativeJar = tasks.register<Jar>("linuxPlatformNativeJar") {
    destinationDirectory.set(file("$buildDir/distribute"))
-   archiveFileName.set("$linuxPublishArtifactName.jar")
+   archiveFileName.set("${project.name}.jar")
+   archiveClassifier.set("linux")
 }
 val linuxPlatformConfiguration = configurations.register(linuxPlatformNativeJar.name)
 linuxPlatformConfiguration.get().apply {
@@ -62,10 +63,10 @@ linuxPlatformConfiguration.get().apply {
    logger.info("Added $name configuration")
 }
 
-val macOsPublishArtifactName = "SteamSdkJni-macos"
 val macOsPlatformNativeJar = tasks.register<Jar>("macOsPlatformNativeJar") {
    destinationDirectory.set(file("$buildDir/distribute"))
-   archiveFileName.set("$macOsPublishArtifactName.jar")
+   archiveFileName.set("${project.name}.jar")
+   archiveClassifier.set("macos")
 }
 val macOsPlatformConfiguration = configurations.register(macOsPlatformNativeJar.name)
 macOsPlatformConfiguration.get().apply {
@@ -90,7 +91,7 @@ publishing {
 val currentPlatformNativePublication = publishing.publications.create<MavenPublication>(project.name) {
    groupId = project.group as String
    version = project.version as String
-   artifactId = "replace"
+   artifactId = project.name
 }
 
 library {
@@ -125,9 +126,8 @@ library {
 
       val osName = when {
          targetMachine.operatingSystemFamily.isWindows -> {
-            if (currentPlatformNativePublication.artifactId == "replace") {
+            if (currentPlatformNativePublication.artifacts.size <= 0) {
                currentPlatformNativePublication.artifact(windowsPlatformNativeJar.get())
-               currentPlatformNativePublication.artifactId = windowsPublishArtifactName
                artifacts {
                   add(windowsPlatformConfiguration.name, windowsPlatformNativeJar)
                }
@@ -135,9 +135,8 @@ library {
             OperatingSystemFamily.WINDOWS
          }
          targetMachine.operatingSystemFamily.isMacOs -> {
-            if (currentPlatformNativePublication.artifactId == "replace") {
+            if (currentPlatformNativePublication.artifacts.size <= 0) {
                currentPlatformNativePublication.artifact(macOsPlatformNativeJar.get())
-               currentPlatformNativePublication.artifactId = macOsPublishArtifactName
                artifacts {
                   add(macOsPlatformConfiguration.name, macOsPlatformNativeJar)
                }
@@ -145,9 +144,8 @@ library {
             OperatingSystemFamily.MACOS
          }
          targetMachine.operatingSystemFamily.isLinux -> {
-            if (currentPlatformNativePublication.artifactId == "replace") {
+            if (currentPlatformNativePublication.artifacts.size <= 0) {
                currentPlatformNativePublication.artifact(linuxPlatformNativeJar.get())
-               currentPlatformNativePublication.artifactId = linuxPublishArtifactName
                artifacts {
                   add(linuxPlatformConfiguration.name, linuxPlatformNativeJar)
                }
@@ -349,7 +347,7 @@ library {
 }
 
 //
-val syncSteamSdkJniHeaders = tasks.register<Sync>("syncSteamSdkJniHeaders") {
+val syncSteamSdkJniHeaders = tasks.register<Copy>("syncSteamSdkJniHeaders") {
    dependsOn(steamSdkJniHeaders)
 
    steamSdkJniHeaders.get().forEach {
