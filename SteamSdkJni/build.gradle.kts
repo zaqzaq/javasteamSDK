@@ -39,6 +39,7 @@ val macOsDylibLipo = tasks.register<Exec>("macOsDylibLipo") {
    args(outputLibName)
 }
 
+// karlfixme these need to be classifiers for exporting w/ composite builds. Right now composite build isn't capable of overriding these.
 val windowsPublishArtifactName = "SteamSdkJni-windows"
 val windowsPlatformNativeJar = tasks.register<Jar>("windowsPlatformNativeJar") {
    destinationDirectory.set(file("$buildDir/distribute"))
@@ -124,7 +125,7 @@ library {
 
       val osName = when {
          targetMachine.operatingSystemFamily.isWindows -> {
-            if(currentPlatformNativePublication.artifactId == "replace") {
+            if (currentPlatformNativePublication.artifactId == "replace") {
                currentPlatformNativePublication.artifact(windowsPlatformNativeJar.get())
                currentPlatformNativePublication.artifactId = windowsPublishArtifactName
                artifacts {
@@ -134,7 +135,7 @@ library {
             OperatingSystemFamily.WINDOWS
          }
          targetMachine.operatingSystemFamily.isMacOs -> {
-            if(currentPlatformNativePublication.artifactId == "replace") {
+            if (currentPlatformNativePublication.artifactId == "replace") {
                currentPlatformNativePublication.artifact(macOsPlatformNativeJar.get())
                currentPlatformNativePublication.artifactId = macOsPublishArtifactName
                artifacts {
@@ -144,7 +145,7 @@ library {
             OperatingSystemFamily.MACOS
          }
          targetMachine.operatingSystemFamily.isLinux -> {
-            if(currentPlatformNativePublication.artifactId == "replace") {
+            if (currentPlatformNativePublication.artifactId == "replace") {
                currentPlatformNativePublication.artifact(linuxPlatformNativeJar.get())
                currentPlatformNativePublication.artifactId = linuxPublishArtifactName
                artifacts {
