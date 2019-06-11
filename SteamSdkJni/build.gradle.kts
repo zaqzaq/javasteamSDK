@@ -11,7 +11,6 @@ version = rootProject.version
 
 plugins {
    id("com.nimblygames.gradle")
-   `maven-publish`
    `cpp-library`
    xcode
    `microsoft-visual-cpp-compiler`
@@ -41,57 +40,15 @@ val macOsDylibLipo = tasks.register<Exec>("macOsDylibLipo") {
    args(outputLibName)
 }
 
-val windowsPlatformNativeJar = tasks.register<Jar>("windowsPlatformNativeJar") {
+val nativeArtifactName = "SteamSdkJni-natives"
+val platformNativeZip = tasks.register<Zip>("platformNativeZip") {
    destinationDirectory.set(file("$buildDir/distribute"))
-   archiveFileName.set("${project.name}.jar")
-   archiveClassifier.set("windows")
+   archiveFileName.set("$nativeArtifactName.zip")
 }
-val windowsPlatformConfiguration = configurations.register(windowsPlatformNativeJar.name)
-windowsPlatformConfiguration.get().apply {
-   // need to call .get so this so this configuration is registered on all platforms
-   logger.info("Added $name configuration")
-}
+val nativePlatformConfiguration = configurations.register(platformNativeZip.name)
 
-val linuxPlatformNativeJar = tasks.register<Jar>("linuxPlatformNativeJar") {
-   destinationDirectory.set(file("$buildDir/distribute"))
-   archiveFileName.set("${project.name}.jar")
-   archiveClassifier.set("linux")
-}
-val linuxPlatformConfiguration = configurations.register(linuxPlatformNativeJar.name)
-linuxPlatformConfiguration.get().apply {
-   // need to call .get so this so this configuration is registered on all platforms
-   logger.info("Added $name configuration")
-}
-
-val macOsPlatformNativeJar = tasks.register<Jar>("macOsPlatformNativeJar") {
-   destinationDirectory.set(file("$buildDir/distribute"))
-   archiveFileName.set("${project.name}.jar")
-   archiveClassifier.set("macos")
-}
-val macOsPlatformConfiguration = configurations.register(macOsPlatformNativeJar.name)
-macOsPlatformConfiguration.get().apply {
-   // need to call .get so this so this configuration is registered on all platforms
-   logger.info("Added $name configuration")
-}
-
-val platformNativeJarTasks = arrayOf(windowsPlatformNativeJar, linuxPlatformNativeJar, macOsPlatformNativeJar)
-
-publishing {
-   repositories {
-      maven {
-         url = uri("https://artifactory.nimblygames.com/artifactory/gradle-release-local/")
-         credentials {
-            username = rootProject.findProperty("artifactory_user") as String
-            password = rootProject.findProperty("artifactory_password") as String
-         }
-      }
-   }
-}
-
-val currentPlatformNativePublication = publishing.publications.create<MavenPublication>(project.name) {
-   groupId = project.group as String
-   version = project.version as String
-   artifactId = project.name
+artifacts {
+   add(nativePlatformConfiguration.name, platformNativeZip)
 }
 
 library {
@@ -126,30 +83,12 @@ library {
 
       val osName = when {
          targetMachine.operatingSystemFamily.isWindows -> {
-            if (currentPlatformNativePublication.artifacts.size <= 0) {
-               currentPlatformNativePublication.artifact(windowsPlatformNativeJar.get())
-               artifacts {
-                  add(windowsPlatformConfiguration.name, windowsPlatformNativeJar)
-               }
-            }
             OperatingSystemFamily.WINDOWS
          }
          targetMachine.operatingSystemFamily.isMacOs -> {
-            if (currentPlatformNativePublication.artifacts.size <= 0) {
-               currentPlatformNativePublication.artifact(macOsPlatformNativeJar.get())
-               artifacts {
-                  add(macOsPlatformConfiguration.name, macOsPlatformNativeJar)
-               }
-            }
             OperatingSystemFamily.MACOS
          }
          targetMachine.operatingSystemFamily.isLinux -> {
-            if (currentPlatformNativePublication.artifacts.size <= 0) {
-               currentPlatformNativePublication.artifact(linuxPlatformNativeJar.get())
-               artifacts {
-                  add(linuxPlatformConfiguration.name, linuxPlatformNativeJar)
-               }
-            }
             OperatingSystemFamily.LINUX
          }
          else -> {
@@ -272,20 +211,19 @@ library {
             }
          }
 
-         platformNativeJarTasks.forEach { nativeJarTask ->
-            nativeJarTask.configure {
-               dependsOn(binaryLinkTask)
+         platformNativeZip.configure {
+            dependsOn(binaryLinkTask)
 
-               if (targetMachine.operatingSystemFamily.isMacOs) {
-                  dependsOn(macOsDylibLipo)
-               }
+            if (targetMachine.operatingSystemFamily.isMacOs) {
+               dependsOn(macOsDylibLipo)
             }
          }
 
          when {
             targetMachine.operatingSystemFamily.isWindows -> {
                val steamApiSharedLibrary = file("$steamSdkDirPath/redistributable_bin/steam_api.dll")
-               windowsPlatformNativeJar.configure {
+               platformNativeZip.configure {
+                  dependsOn(binaryLinkTask)
                   if (!inputs.files.contains(steamApiSharedLibrary)) {
                      from(steamApiSharedLibrary) {
                         into("$osName-x86")
@@ -295,7 +233,7 @@ library {
                      }
                   }
                   binaryLinkTask.outputs.files.forEach {
-                     if (it.name.endsWith(".dll") || it.name.endsWith(".so")) {
+                     if (it.name.endsWith(".dll")) {
                         from(it) {
                            into("$osName-${targetMachine.architecture.name}")
                         }
@@ -305,7 +243,8 @@ library {
             }
             targetMachine.operatingSystemFamily.isMacOs -> {
                val steamApiSharedLibrary = file("$steamSdkDirPath/redistributable_bin/osx32/libsteam_api.dylib")
-               macOsPlatformNativeJar.configure {
+               platformNativeZip.configure {
+                  dependsOn(binaryLinkTask)
                   if (!inputs.files.contains(steamApiSharedLibrary)) {
                      from(steamApiSharedLibrary) {
                         into(osName)
@@ -320,7 +259,8 @@ library {
             }
             targetMachine.operatingSystemFamily.isLinux -> {
                val steamApiSharedLibrary = file("$steamSdkDirPath/redistributable_bin/linux32/libsteam_api.so")
-               linuxPlatformNativeJar.configure {
+               platformNativeZip.configure {
+                  dependsOn(binaryLinkTask)
                   if (!inputs.files.contains(steamApiSharedLibrary)) {
                      from(steamApiSharedLibrary) {
                         into("$osName-x86")
@@ -330,7 +270,7 @@ library {
                      }
                   }
                   binaryLinkTask.outputs.files.forEach {
-                     if (it.name.endsWith(".dll") || it.name.endsWith(".so")) {
+                     if (it.name.endsWith(".so")) {
                         from(it) {
                            into("$osName-${targetMachine.architecture.name}")
                         }
@@ -347,7 +287,7 @@ library {
 }
 
 //
-val syncSteamSdkJniHeaders = tasks.register<Copy>("syncSteamSdkJniHeaders") {
+val syncSteamSdkJniHeaders = tasks.register<Sync>("syncSteamSdkJniHeaders") {
    dependsOn(steamSdkJniHeaders)
 
    steamSdkJniHeaders.get().forEach {
@@ -357,6 +297,7 @@ val syncSteamSdkJniHeaders = tasks.register<Copy>("syncSteamSdkJniHeaders") {
 }
 tasks.named("assemble") {
    dependsOn(syncSteamSdkJniHeaders)
+   dependsOn(platformNativeZip)
 }
 
 tasks.withType(CppCompile::class.java) {

@@ -6,6 +6,10 @@
  * Copyright (c) 2019 Nimbly Games, LLC all rights reserved
  */
 
+/*
+ * Copyright (c) 2019 Nimbly Games, LLC all rights reserved
+ */
+
 val artifactory_user: String? by settings
 val artifactory_password: String? by settings
 
@@ -38,3 +42,6 @@ rootProject.name = "steam"
 
 include("SteamSdk")
 include("SteamSdkJni")
+include("SteamSdkJni-linux")
+include("SteamSdkJni-macos")
+include("SteamSdkJni-windows")

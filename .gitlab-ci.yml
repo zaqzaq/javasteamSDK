@@ -6,63 +6,7 @@
 #  - git clone git@gitlab.nimblygames.com:NimblyGames/core.git
 
 stages:
-  - build
-  - test
   - publish
-
-buildWindows:
-  stage: build
-  tags:
-    - windows
-  script:
-    - .\gradlew -i --no-build-cache clean assemble
-  artifacts:
-    paths:
-      - build/libs/*.jar
-    expire_in: 1 week
-
-buildLinux:
-  stage: build
-  tags:
-    - ubuntu
-  script:
-    ./gradlew -i --no-build-cache clean assemble
-  artifacts:
-    paths:
-      - build/libs/*.jar
-    expire_in: 1 week
-
-buildOsx:
-  stage: build
-  tags:
-    - osx
-  script:
-    ./gradlew -i --no-build-cache clean assemble
-  artifacts:
-    paths:
-      - build/libs/*.jar
-    expire_in: 1 week
-
-testWindows:
-  stage: test
-  tags:
-    - windows
-  script:
-    - ./gradlew -i --no-build-cache clean check
-
-testLinux:
-  stage: test
-  tags:
-    - ubuntu
-  script:
-    - ./gradlew -i --no-build-cache clean check
-
-testOsx:
-  stage: test
-  tags:
-    - osx
-  script:
-    - ./gradlew -i --no-build-cache clean check
 
 publishWindows:
   stage: publish
