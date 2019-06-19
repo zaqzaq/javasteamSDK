@@ -32,7 +32,7 @@ pluginManagement {
    resolutionStrategy {
       eachPlugin {
          if (requested.id.id == "com.nimblygames.gradle") {
-            useModule("com.nimblygames:GradlePlugin:1.0.2")
+            useModule("com.nimblygames:GradlePlugin:1.0.3")
          }
       }
    }
