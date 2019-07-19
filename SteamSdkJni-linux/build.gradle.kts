@@ -14,7 +14,7 @@ version = rootProject.version
 plugins {
    id("com.nimblygames.gradle")
    `maven-publish`
-   java
+   `java-library`
 }
 
 val steamSdkJniConfiguration = configurations.register("steamSdkJniConfiguration")
