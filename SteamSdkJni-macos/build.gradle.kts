@@ -35,8 +35,8 @@ publishing {
       maven {
          url = uri("https://artifactory.nimblygames.com/artifactory/gradle-release-local/")
          credentials {
-            username = rootProject.findProperty("artifactory_user") as String
-            password = rootProject.findProperty("artifactory_password") as String
+            username = rootProject.findProperty("artifactServerUsername") as String
+            password = rootProject.findProperty("artifactServerPassword") as String
          }
       }
    }

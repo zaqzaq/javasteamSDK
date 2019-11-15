@@ -134,10 +134,10 @@ val nativeHeaders = tasks.register("nativeHeaders") {
             }
             if (foundCr) {
                logger.info("Replaced \\r in path = $path")
-               Files.move(outputFile?.toPath(), path, StandardCopyOption.REPLACE_EXISTING)
+               Files.move(outputFile!!.toPath(), path, StandardCopyOption.REPLACE_EXISTING)
             } else {
-               if (Files.exists(outputFile?.toPath())) {
-                  Files.delete(outputFile?.toPath())
+               if (Files.exists(outputFile!!.toPath())) {
+                  Files.delete(outputFile.toPath())
                }
             }
          }
@@ -164,8 +164,8 @@ publishing {
       maven {
          url = uri("https://artifactory.nimblygames.com/artifactory/gradle-release-local/")
          credentials {
-            username = rootProject.findProperty("artifactory_user") as String
-            password = rootProject.findProperty("artifactory_password") as String
+            username = rootProject.findProperty("artifactServerUsername") as String
+            password = rootProject.findProperty("artifactServerPassword") as String
          }
       }
    }

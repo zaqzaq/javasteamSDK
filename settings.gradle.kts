@@ -1,8 +1,8 @@
 /*
  * Copyright (c) 2019 Nimbly Games, LLC all rights reserved
  */
-val artifactory_user: String? by settings
-val artifactory_password: String? by settings
+val artifactServerUsername: String? by settings
+val artifactServerPassword: String? by settings
 
 pluginManagement {
    repositories {
@@ -10,8 +10,8 @@ pluginManagement {
          url = uri("https://artifactory.nimblygames.com/artifactory/gradle-release-local/")
          credentials {
 
-            username = artifactory_user
-            password = artifactory_password
+            username = artifactServerUsername
+            password = artifactServerPassword
          }
       }
 
