@@ -9,7 +9,8 @@ pluginManagement {
       maven {
          url = uri("https://artifactory.nimblygames.com/artifactory/gradle-release-local/")
          credentials {
-
+            val artifactServerUsername: String by settings
+            val artifactServerPassword: String by settings
             username = artifactServerUsername
             password = artifactServerPassword
          }
