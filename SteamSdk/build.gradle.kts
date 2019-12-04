@@ -40,8 +40,8 @@ dependencies {
 
    // logging
    implementation("org.slf4j:slf4j-api:$slf4jVersion")
-   runtime("org.apache.logging.log4j:log4j-slf4j-impl:$log4jVersion")
-   runtime("org.apache.logging.log4j:log4j-core:$log4jVersion")
+   runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:$log4jVersion")
+   runtimeOnly("org.apache.logging.log4j:log4j-core:$log4jVersion")
 }
 
 tasks.withType(Test::class.java) {
