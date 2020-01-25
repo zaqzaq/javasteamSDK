@@ -1,4 +1,8 @@
 /*
+ * Copyright (c) 2020 Nimbly Games, LLC all rights reserved
+ */
+
+/*
  * Copyright (c) 2019 Nimbly Games, LLC all rights reserved
  */
 
@@ -23,6 +27,6 @@ repositories {
 }
 
 tasks.named<Wrapper>("wrapper") {
-   gradleVersion = "6.0.1"
+   gradleVersion = "6.1.1"
    distributionType = Wrapper.DistributionType.ALL
 }
