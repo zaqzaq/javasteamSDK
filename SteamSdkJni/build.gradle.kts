@@ -21,14 +21,27 @@ repositories {
    jcenter()
 }
 
+/**
+ * Add dependency on SteamSdk JNI headers.
+ */
 val steamSdkJniHeaders = configurations.register("steamSdkJniHeaders")
 dependencies {
    steamSdkJniHeaders.get()(project(":SteamSdk", "jniHeaders"))
 }
 
+/**
+ * Steam SDK directory.
+ */
 val steamSdkDirPath = "$projectDir/sdk/sdk_144"
+
+/**
+ * Java home that's running Gradle
+ */
 val javaHomePathString: String = Jvm.current().javaHome.absolutePath
 
+/**
+ * Create a combined library for all target platforms.
+ */
 val macOsDylibLipo = tasks.register<Exec>("macOsDylibLipo") {
    val outputLibName = "lib${project.name}.dylib"
    workingDir = File(buildDir, "distribute")
@@ -40,11 +53,22 @@ val macOsDylibLipo = tasks.register<Exec>("macOsDylibLipo") {
    args(outputLibName)
 }
 
+/**
+ * Name for the zip artifact to publish the native libraries into.
+ */
 val nativeArtifactName = "SteamSdkJni-natives"
+
+/**
+ * Create a zip of all native libraries.
+ */
 val platformNativeZip = tasks.register<Zip>("platformNativeZip") {
    destinationDirectory.set(file("$buildDir/distribute"))
    archiveFileName.set("$nativeArtifactName.zip")
 }
+
+/**
+ * Configuration for making native libraries available to other Gradle projects.
+ */
 val nativePlatformConfiguration = configurations.register(platformNativeZip.name)
 
 artifacts {
@@ -54,12 +78,7 @@ artifacts {
 library {
    linkage.set(listOf(Linkage.SHARED))
 
-   targetMachines.set(listOf(machines.windows.x86,
-                             machines.windows.x86_64,
-                             machines.linux.x86,
-                             machines.linux.x86_64,
-                             machines.macOS.x86,
-                             machines.macOS.x86_64))
+   targetMachines.set(listOf(machines.windows.x86, machines.windows.x86_64, machines.linux.x86, machines.linux.x86_64, machines.macOS.x86_64))
 
    toolChains.forEach { toolChain ->
       if (toolChain is VisualCpp) {
@@ -72,10 +91,8 @@ library {
       val binaryToolChain = toolChain
 
       val binaryCompileTask = compileTask.get()
-      val binaryLinkTask: LinkSharedLibrary = if (this is CppSharedLibrary)
-         linkTask.get()
-      else
-         return@configureEach
+      val binaryLinkTask: LinkSharedLibrary = if (this is CppSharedLibrary) linkTask.get()
+      else return@configureEach
 
       binaryCompileTask.includes(file("$buildDir/steamSdkJniHeaders"))
       binaryCompileTask.includes(file("$javaHomePathString/include"))
@@ -194,20 +211,16 @@ library {
             macOsDylibLipo.configure {
                dependsOn(binaryLinkTask)
 
-               binaryLinkTask.outputs.files.files
-                     .stream()
-                     .filter({ file -> file.name.endsWith(".dylib") })
-                     .findFirst()
-                     .ifPresent({ binaryFile ->
-                                   inputs.file(binaryFile)
-                                   args("-arch")
-                                   if (targetMachine.architecture.name == MachineArchitecture.X86) {
-                                      args("i386")
-                                   } else if (targetMachine.architecture.name == MachineArchitecture.X86_64) {
-                                      args("x86_64")
-                                   }
-                                   args("$binaryFile")
-                                })
+               binaryLinkTask.outputs.files.files.stream().filter { file -> file.name.endsWith(".dylib") }.findFirst().ifPresent { binaryFile ->
+                  inputs.file(binaryFile)
+                  args("-arch")
+                  if (targetMachine.architecture.name == MachineArchitecture.X86) {
+                     args("i386")
+                  } else if (targetMachine.architecture.name == MachineArchitecture.X86_64) {
+                     args("x86_64")
+                  }
+                  args("$binaryFile")
+               }
             }
          }
 
@@ -286,7 +299,9 @@ library {
    }
 }
 
-//
+/**
+ * Extract the JNI header files from the SteamSdk project.
+ */
 val syncSteamSdkJniHeaders = tasks.register<Sync>("syncSteamSdkJniHeaders") {
    dependsOn(steamSdkJniHeaders)
 
@@ -300,7 +315,7 @@ tasks.named("assemble") {
    dependsOn(platformNativeZip)
 }
 
-tasks.withType(CppCompile::class.java) {
+tasks.withType(CppCompile::class) {
    dependsOn(syncSteamSdkJniHeaders)
 }
 
