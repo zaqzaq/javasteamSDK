@@ -2,21 +2,8 @@
  * Copyright (c) 2020 Nimbly Games, LLC all rights reserved
  */
 
-/*
- * Copyright (c) 2019 Nimbly Games, LLC all rights reserved
- */
-
-/*
- * Copyright (c) 2019 Nimbly Games, LLC all rights reserved
- */
-
-/*
- * Copyright (c) 2019 Nimbly Games, LLC all rights reserved
- */
-
-
 group = "com.nimblygames.steam"
-version = "1.0.3"
+version = "1.1.0-SNAPSHOT"
 
 plugins {
    id("com.nimblygames.gradle")
