@@ -12,17 +12,25 @@ group = rootProject.group
 version = rootProject.version
 
 plugins {
+   `java-library`
    id("com.nimblygames.gradle")
    `maven-publish`
-   `java-library`
 }
 
+java {
+   sourceCompatibility = JavaVersion.VERSION_1_8
+   targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+/**
+ * Configuration for exporting native libraries
+ */
 val steamSdkJniConfiguration = configurations.register("steamSdkJniConfiguration")
 dependencies {
    steamSdkJniConfiguration.get()(project(":SteamSdkJni", "platformNativeZip"))
 }
 
-val processResources = tasks.named<ProcessResources>(JavaPlugin.PROCESS_RESOURCES_TASK_NAME) {
+tasks.named<ProcessResources>(JavaPlugin.PROCESS_RESOURCES_TASK_NAME) {
    dependsOn(steamSdkJniConfiguration.get())
 
    steamSdkJniConfiguration.get().forEach { configurationFile ->

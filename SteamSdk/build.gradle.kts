@@ -5,20 +5,14 @@
 import com.nimblygames.gradle.junitVersion
 import com.nimblygames.gradle.log4jVersion
 import com.nimblygames.gradle.slf4jVersion
-import org.gradle.internal.jvm.Jvm
-import java.nio.ByteBuffer
-import java.nio.channels.SeekableByteChannel
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
-import java.nio.file.StandardOpenOption
 
 group = rootProject.group
 version = rootProject.version
 
 plugins {
+   `java-library`
    id("com.nimblygames.gradle")
    `maven-publish`
-   `java-library`
 }
 
 repositories {
@@ -48,115 +42,28 @@ tasks.withType(Test::class.java) {
    maxParallelForks = 1
 }
 
-// generate headers
-val nativeHeaders = tasks.register("nativeHeaders") {
-   dependsOn("classes")
-   val outputDirectory = file("$buildDir/steamjni/cpp")
-   val classesToRunJavahOn = arrayOf("steam.steam_api",
-                                     "steam.ISteamUserStats",
-                                     "steam.ISteamFriends",
-                                     "steam.ISteamUser",
-                                     "steam.ISteamUtils",
-                                     "steam.steam_gameserver",
-                                     "steam.ISteamGameServer",
-                                     "steam.ISteamRemoteStorage",
-                                     "steam.SteamUserStatsListener",
-                                     "steam.ISteamController",
-                                     "steam.ISteamApps"
-   )
-   inputs.dir(sourceSets["main"].java.outputDir)
-   inputs.property("classes", classesToRunJavahOn)
-   outputs.dir(outputDirectory)
+/**
+ * Directory that generated header files are saved during java compile.
+ */
+val jniHeaderGenerationDirectory = file("$buildDir/steamjni/cpp")
 
-   doLast {
-      outputDirectory.parentFile.mkdirs()
-      exec {
-         executable = Jvm.current().getExecutable("javah").canonicalPath
-         args("-d")
-         args(outputDirectory.canonicalPath)
-         args("-classpath")
-         args(sourceSets["main"].output.classesDirs.asPath)
-         classesToRunJavahOn.forEach { classToGenerateHeaderFor ->
-            args(classToGenerateHeaderFor)
-         }
-
-         args.forEach { theArg ->
-            logger.info(theArg)
-         }
-      }
-
-      Files.newDirectoryStream(outputDirectory.toPath()).use { directoryStream ->
-         directoryStream.forEach { path ->
-            if (!path.fileName.toString().endsWith(".h")) {
-               return@forEach
-            }
-            var inputChannel: SeekableByteChannel? = null
-            var outputChannel: SeekableByteChannel? = null
-            var foundCr = false
-            var outputFile: File? = null
-            try {
-               inputChannel = Files.newByteChannel(path, StandardOpenOption.READ)
-               outputFile =
-                     File(path.toFile().absoluteFile.parentFile, "${path.fileName}lf")
-               outputChannel =
-                     Files.newByteChannel(outputFile.toPath(),
-                                          StandardOpenOption.CREATE,
-                                          StandardOpenOption.TRUNCATE_EXISTING,
-                                          StandardOpenOption.WRITE)
-               foundCr = false
-
-               val inBuffer = ByteBuffer.allocate(1024)
-               val outBuffer = ByteBuffer.allocate(inBuffer.capacity())
-               while (true) {
-                  inBuffer.clear()
-                  outBuffer.clear()
-                  val bytesRead = inputChannel.read(inBuffer)
-                  if (bytesRead < 0) {
-                     break
-                  }
-                  inBuffer.flip()
-                  while (inBuffer.remaining() > 0) {
-                     val b = inBuffer.get()
-                     if (b == '\r'.toByte()) {
-                        foundCr = true
-                     } else {
-                        outBuffer.put(b)
-                     }
-                  }
-                  outBuffer.flip()
-                  outputChannel.write(outBuffer)
-               }
-            } catch (throwable: Throwable) {
-               logger.error("Failed to remove carriage returns from header files", throwable)
-            } finally {
-               inputChannel?.close()
-               outputChannel?.close()
-            }
-            if (foundCr) {
-               logger.info("Replaced \\r in path = $path")
-               Files.move(outputFile!!.toPath(), path, StandardCopyOption.REPLACE_EXISTING)
-            } else {
-               if (Files.exists(outputFile!!.toPath())) {
-                  Files.delete(outputFile.toPath())
-               }
-            }
-         }
-      }
-   }
+/**
+ * The Java compile task. Updated to produce native header files in [jniHeaderGenerationDirectory].
+ */
+val compileJava = tasks.named<JavaCompile>(JavaPlugin.COMPILE_JAVA_TASK_NAME) {
+   this.options.headerOutputDirectory.set(jniHeaderGenerationDirectory)
 }
 
-// always run header generation after classes are created
-tasks.named("classes") {
-   finalizedBy(nativeHeaders)
-}
-
-val jniHeaders = tasks.register<Zip>("jniHeaders") {
-   dependsOn(nativeHeaders)
+/**
+ * Zips all files in [jniHeaderGenerationDirectory] for consumption as part of the `jniHeaders` configuration.
+ */
+val zipJniHeaders = tasks.register<Zip>("zipJniHeaders") {
+   dependsOn(compileJava)
    from("$buildDir/steamjni/cpp")
 }
 
 artifacts {
-   add(configurations.register("jniHeaders").name, jniHeaders)
+   add(configurations.register("jniHeaders").name, zipJniHeaders)
 }
 
 publishing {
