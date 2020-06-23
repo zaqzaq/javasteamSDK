@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Nimbly Games, LLC all rights reserved
+ * Copyright (c) 2020 Nimbly Games, LLC all rights reserved
  */
 
 import org.apache.tools.ant.taskdefs.condition.Os
@@ -50,7 +50,7 @@ publishing {
    }
    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
       publications {
-         create<MavenPublication>(project.name) {
+         register<MavenPublication>(project.name) {
             groupId = project.group as String
             version = project.version as String
             artifactId = project.name
