@@ -1,11 +1,24 @@
 /*
- * Copyright (c) 2020 Nimbly Games, LLC all rights reserved
+ * Copyright 2020 Nimbly Games, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
+import com.nimblygames.gradle.addNimblyGamesPublishRepositories
 import org.apache.tools.ant.taskdefs.condition.Os
 
 /*
- * Repackage the native jars from SteamSdkJni so they are available to Gradle composite builds. Composite builds to not support classifiers.
+ * Repackage the native jars from SteamSdkJni so they are available to Gradle composite builds. Composite builds do not support classifiers.
  */
 
 group = rootProject.group
@@ -15,6 +28,7 @@ plugins {
    `java-library`
    id("com.nimblygames.gradle")
    `maven-publish`
+   signing
 }
 
 java {
@@ -39,25 +53,59 @@ tasks.named<ProcessResources>(JavaPlugin.PROCESS_RESOURCES_TASK_NAME) {
    }
 }
 
+/**
+ * Is the packer version a snapshot or release?
+ */
+val isSnapshot = project.version.toString().contains("SNAPSHOT")
+
 publishing {
    repositories {
-      maven {
-         url = uri("https://artifactory.nimblygames.com/artifactory/gradle-release-local/")
-         credentials {
-            username = rootProject.findProperty("artifactServerUsername") as String
-            password = rootProject.findProperty("artifactServerPassword") as String
-         }
-      }
+      addNimblyGamesPublishRepositories(project, isSnapshot)
    }
    if (Os.isFamily(Os.FAMILY_MAC)) {
       publications {
          register<MavenPublication>(project.name) {
             groupId = project.group as String
             version = project.version as String
-            artifactId = project.name
+            artifactId = project.name.toLowerCase()
 
             artifact(tasks.getByName(JavaPlugin.JAR_TASK_NAME))
+
+            pom {
+               name.set("SteamSdkJni-linux")
+               description.set("Native JNI code for Linux.")
+               url.set("https://nimblygames.com/")
+               licenses {
+                  license {
+                     name.set("The Apache License, Version 2.0")
+                     url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                  }
+               }
+               developers {
+                  developer {
+                     id.set("KarlSabo")
+                     name.set("Karl Sabo")
+                     email.set("karl@nimblygames.com")
+                  }
+               }
+               scm {
+                  connection.set("scm:git:https://gitlab.com/nimblygames/steam")
+                  developerConnection.set("scm:git:https://gitlab.com/nimblygames/steam")
+                  url.set("https://gitlab.com/nimblygames/steam")
+               }
+            }
          }
       }
+   }
+}
+
+signing.useGpgCmd()
+
+if (isSnapshot) {
+   logger.info("Skipping signing")
+} else {
+   publishing.publications.configureEach {
+      logger.info("Should sign publication ${this.name}")
+      signing.sign(this)
    }
 }
