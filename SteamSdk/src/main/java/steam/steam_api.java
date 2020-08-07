@@ -1,5 +1,17 @@
 /*
- * Copyright (c) 2019 Nimbly Games, LLC all rights reserved
+ * Copyright 2020 Nimbly Games, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package steam;
@@ -30,11 +42,11 @@ public class steam_api {
 
    private static final String OS_NAME = System.getProperty("os.name").toLowerCase();
 
-   private static boolean isWindows = System.getProperty("os.name").contains("Windows");
-   private static boolean isLinux = System.getProperty("os.name").contains("Linux");
-   private static boolean isMac = System.getProperty("os.name").contains("Mac");
+   private static final boolean isWindows = System.getProperty("os.name").contains("Windows");
+   private static final boolean isLinux = System.getProperty("os.name").contains("Linux");
+   private static final boolean isMac = System.getProperty("os.name").contains("Mac");
    // NOTE: os.arch is based on the architecture of the currently running JVM (not the computer's Operating System)
-   private static boolean is64Bit = System.getProperty("os.arch").equals("amd64") || System.getProperty("os.arch").equals("x86_64");
+   private static final boolean is64Bit = System.getProperty("os.arch").equals("amd64") || System.getProperty("os.arch").equals("x86_64");
 
    private static void extractAndLoadLibrary(final Path dir, final String libraryName) throws IOException {
 

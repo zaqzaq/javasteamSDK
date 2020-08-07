@@ -1,12 +1,24 @@
 /*
- * Copyright (c) 2019 Nimbly Games, LLC all rights reserved
+ * Copyright 2020 Nimbly Games, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package steam;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class ISteamApps {
 	public static boolean isSubscribed(){
@@ -89,8 +101,8 @@ public class ISteamApps {
 		byte availableByte = buffer.get();
 		byte[] nameBytes = new byte[128];
 		buffer.get(nameBytes);
-		String name = new String(nameBytes, Charset.forName("UTF-8"));
-		
+		String name = new String(nameBytes, StandardCharsets.UTF_8);
+
 		return new SteamDlcInfo(appId, availableByte != 0, name);
 	}
 	private static native void nGetDLCDataByIndex(int iDLC, ByteBuffer buffer);
