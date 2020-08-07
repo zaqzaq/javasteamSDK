@@ -92,12 +92,10 @@ library {
 
    targetMachines.set(listOf(machines.windows.x86, machines.windows.x86_64, machines.linux.x86, machines.linux.x86_64, machines.macOS.x86_64))
 
-   binaries.configureEach {
+   binaries.configureEach(CppSharedLibrary::class.java) {
       val binaryToolChain = toolChain
-
       val binaryCompileTask = compileTask.get()
-      val binaryLinkTask: LinkSharedLibrary = if (this is CppSharedLibrary) linkTask.get()
-      else return@configureEach
+      val binaryLinkTask: LinkSharedLibrary = linkTask.get()
 
       binaryCompileTask.includes(file("$buildDir/steamSdkJniHeaders"))
       binaryCompileTask.includes(file("$javaHomePathString/include"))
