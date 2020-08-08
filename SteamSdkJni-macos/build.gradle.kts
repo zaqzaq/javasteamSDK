@@ -67,13 +67,13 @@ publishing {
          register<MavenPublication>(project.name) {
             groupId = project.group as String
             version = project.version as String
-            artifactId = project.name.toLowerCase()
+            artifactId = "steam-sdk-jni-macos"
 
             artifact(tasks.getByName(JavaPlugin.JAR_TASK_NAME))
 
             pom {
                name.set("SteamSdkJni-linux")
-               description.set("Native JNI code for Linux.")
+               description.set("Native JNI code for macOS.")
                url.set("https://nimblygames.com/")
                licenses {
                   license {

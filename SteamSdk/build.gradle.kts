@@ -95,7 +95,7 @@ publishing {
          version = project.version as String
 
          from(components["java"])
-         artifactId = project.name.toLowerCase()
+         artifactId = "steam-sdk"
 
          pom {
             name.set("SteamSdk")

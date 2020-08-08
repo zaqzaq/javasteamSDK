@@ -66,7 +66,7 @@ publishing {
          register<MavenPublication>(project.name) {
             groupId = project.group as String
             version = project.version as String
-            artifactId = project.name.toLowerCase()
+            artifactId = "steam-sdk-jni-linux"
 
             artifact(tasks.getByName(JavaPlugin.JAR_TASK_NAME))
 
