@@ -61,42 +61,47 @@ publishing {
    repositories {
       addNimblyGamesPublishRepositories(project, isSnapshot)
    }
-   if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-      publications {
-         register<MavenPublication>(project.name) {
-            groupId = project.group as String
-            version = project.version as String
-            artifactId = "steam-sdk-jni-windows"
+   publications {
+      register<MavenPublication>(project.name) {
+         groupId = project.group as String
+         version = project.version as String
+         artifactId = "steam-sdk-jni-windows"
 
-            artifact(tasks.getByName(JavaPlugin.JAR_TASK_NAME))
+         artifact(tasks.getByName(JavaPlugin.JAR_TASK_NAME))
 
-            pom {
-               name.set("SteamSdkJni-windows")
-               description.set("Native JNI code for Windows.")
-               url.set("https://nimblygames.com/")
-               licenses {
-                  license {
-                     name.set("The Apache License, Version 2.0")
-                     url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                  }
+         pom {
+            name.set("SteamSdkJni-windows")
+            description.set("Native JNI code for Windows.")
+            url.set("https://nimblygames.com/")
+            licenses {
+               license {
+                  name.set("The Apache License, Version 2.0")
+                  url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
                }
-               developers {
-                  developer {
-                     id.set("KarlSabo")
-                     name.set("Karl Sabo")
-                     email.set("karl@nimblygames.com")
-                  }
+            }
+            developers {
+               developer {
+                  id.set("KarlSabo")
+                  name.set("Karl Sabo")
+                  email.set("karl@nimblygames.com")
                }
-               scm {
-                  connection.set("scm:git:https://gitlab.com/nimblygames/steam")
-                  developerConnection.set("scm:git:https://gitlab.com/nimblygames/steam")
-                  url.set("https://gitlab.com/nimblygames/steam")
-               }
+            }
+            scm {
+               connection.set("scm:git:https://gitlab.com/nimblygames/steam")
+               developerConnection.set("scm:git:https://gitlab.com/nimblygames/steam")
+               url.set("https://gitlab.com/nimblygames/steam")
             }
          }
       }
    }
 }
+
+tasks.withType(AbstractPublishToMaven::class.java).configureEach {
+   if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
+      enabled = false
+   }
+}
+
 
 signing.useGpgCmd()
 

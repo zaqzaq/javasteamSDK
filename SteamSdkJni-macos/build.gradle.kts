@@ -62,7 +62,6 @@ publishing {
    repositories {
       addNimblyGamesPublishRepositories(project, isSnapshot)
    }
-   if (Os.isFamily(Os.FAMILY_MAC)) {
       publications {
          register<MavenPublication>(project.name) {
             groupId = project.group as String
@@ -96,8 +95,14 @@ publishing {
             }
          }
       }
+}
+
+tasks.withType(AbstractPublishToMaven::class.java).configureEach {
+   if (!Os.isFamily(Os.FAMILY_MAC)) {
+      enabled = false
    }
 }
+
 
 signing.useGpgCmd()
 
