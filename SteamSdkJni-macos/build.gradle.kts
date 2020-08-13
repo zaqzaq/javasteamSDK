@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import com.nimblygames.gradle.addNimblyGamesPublishRepositories
+import com.nimblygames.gradle.addPublishRepositories
 import org.apache.tools.ant.taskdefs.condition.Os
 
 /*
@@ -60,7 +60,7 @@ val isSnapshot = project.version.toString().contains("SNAPSHOT")
 
 publishing {
    repositories {
-      addNimblyGamesPublishRepositories(project, isSnapshot)
+      addPublishRepositories(project, isSnapshot)
    }
       publications {
          register<MavenPublication>(project.name) {
