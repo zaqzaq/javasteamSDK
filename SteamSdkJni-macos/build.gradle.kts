@@ -68,7 +68,7 @@ publishing {
             version = project.version as String
             artifactId = "steam-sdk-jni-macos"
 
-            artifact(tasks.getByName(JavaPlugin.JAR_TASK_NAME))
+            from(components["java"])
 
             pom {
                name.set("SteamSdkJni-linux")
@@ -113,4 +113,9 @@ if (isSnapshot) {
       logger.info("Should sign publication ${this.name}")
       signing.sign(this)
    }
+}
+
+java {
+   @Suppress("UnstableApiUsage") withJavadocJar()
+   @Suppress("UnstableApiUsage") withSourcesJar()
 }
