@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 ### Added
-- Example item
+- Initial release on GitLab.
 ### Changed
 
 ### Deprecated
