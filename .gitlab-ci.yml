@@ -13,7 +13,7 @@ publishWindows:
   tags:
     - windows
   script:
-    - ./gradlew -i --no-build-cache clean build publish
+    - ./gradlew -i --no-build-cache clean build SteamSdkJni-windows:publish
 
 publishLinux:
   stage: publish
@@ -27,7 +27,7 @@ publishOsx:
   tags:
     - osx
   script:
-    - ./gradlew -i --no-build-cache clean build publish
+    - ./gradlew -i --no-build-cache clean build SteamSdkJni-macos:publish
 
 after_script:
   - echo "End CI"
