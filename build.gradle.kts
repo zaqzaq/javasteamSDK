@@ -15,7 +15,7 @@
  */
 
 group = "com.nimblygames.steam"
-version = "1.2.0-SNAPSHOT"
+version = "1.2.0"
 
 plugins {
    id("com.nimblygames.gradle")
