@@ -54,24 +54,34 @@ public class ISteamApps {
 	public static String getAvailableGameLanguages(){
 		return nGetAvailableGameLanguages();
 	}
+
 	private static native String nGetAvailableGameLanguages();
 
-	/**only use this member if you need to check ownership of another game related to yours, a demo for example */
-	public static boolean isSubscribedApp(long appId){
+	/**
+	 * only use this member if you need to check ownership of another game related to yours, a demo for example
+	 */
+	public static boolean isSubscribedApp(long appId) {
 		return nBIsSubscribedApp(appId);
 	}
+
 	public static native boolean nBIsSubscribedApp(long appId);
 
-	/** Takes AppID of DLC and checks if the user owns the DLC & if the DLC is installed*/
-	public static boolean isDlcInstalled(long appId){
+	/**
+	 * Takes AppID of DLC and checks if the user owns the DLC {@code &} if the DLC is installed
+	 */
+	public static boolean isDlcInstalled(long appId) {
 		return nBIsDlcInstalled(appId);
 	}
+
 	public static native boolean nBIsDlcInstalled(long appId);
 
-	/** returns the Unix time of the purchase of the app*/
-	public static long getEarliestPurchaseUnixTime(long appId){
+	/**
+	 * returns the Unix time of the purchase of the app
+	 */
+	public static long getEarliestPurchaseUnixTime(long appId) {
 		return nGetEarliestPurchaseUnixTime(appId);
 	}
+
 	public static native long nGetEarliestPurchaseUnixTime(long appId);
 
 	/** Checks if the user is subscribed to the current app through a free weekend

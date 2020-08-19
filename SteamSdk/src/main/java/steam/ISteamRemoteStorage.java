@@ -45,17 +45,18 @@ public class ISteamRemoteStorage {
 	
 //	virtual bool	FileForget( const char *pchFile ) = 0;
 	/**
-	 * There are two different APIs to delete a file, FileDelete and FileForget.</br>
-	 * FileDelete is meant to be used when a user actively deletes a file.</br> 
-	 * It deletes it from the local disk, and propagates that delete to the remote storage and any other machine the user uses.</br>
-	 * FileForget is meant to be used when you are out of quota.</br>
-	 * It deletes the file from remote storage, but leaves it on the local disk and is still accessible from the API.</br>
-	 * When you are out of Cloud space, FileForget can be used to allow calls to FileWrite to keep working without needing to make the user delete files.</br>
-	 * How you decide which files to forget are up to you.</br>
-	 * It could be a simple LRU queue or something more complicated.</br>
-	 * What's not recommended is leaving it up to the user. While it can be an option, requiring the user to manage their Cloud-ized files for a game - for instance, "Which file would you like to delete so that you may store this new one?" removes a significant advantage of using the Cloud in the first place: its transparency.
-	 *
-	 * Once a file has been deleted or forgotten, it can be re-written with FileWrite. Calling FileWrite on a forgotten file makes it persisted again. Currently, rewriting a forgotten file is the only way to make it persisted again.
+	 * There are two different APIs to delete a file, FileDelete and FileForget.<br> FileDelete is meant to be used when a user actively deletes a file.<br> It
+	 * deletes it from the local disk, and propagates that delete to the remote storage and any other machine the user uses.<br> FileForget is meant to be used
+	 * when you are out of quota.<br> It deletes the file from remote storage, but leaves it on the local disk and is still accessible from the API.<br> When
+	 * you
+	 * are out of Cloud space, FileForget can be used to allow calls to FileWrite to keep working without needing to make the user delete files.<br> How you
+	 * decide which files to forget are up to you.<br> It could be a simple LRU queue or something more complicated.<br> What's not recommended is leaving it up
+	 * to the user. While it can be an option, requiring the user to manage their Cloud-ized files for a game - for instance, "Which file would you like to
+	 * delete so that you may store this new one?" removes a significant advantage of using the Cloud in the first place: its transparency.
+	 * <p>
+	 * Once a file has been deleted or forgotten, it can be re-written with FileWrite. Calling FileWrite on a forgotten file makes it persisted again.
+	 * Currently,
+	 * rewriting a forgotten file is the only way to make it persisted again.
 	 */
 	public static boolean FileForget(String pchFile){
 		return nFileForget(pchFile);
@@ -65,18 +66,22 @@ public class ISteamRemoteStorage {
 	
 	
 //	virtual bool	FileDelete( const char *pchFile ) = 0;
+
 	/**
-	 * There are two different APIs to delete a file, FileDelete and FileForget.</br>
-	 * FileDelete is meant to be used when a user actively deletes a file.</br> 
-	 * It deletes it from the local disk, and propagates that delete to the remote storage and any other machine the user uses.</br>
-	 * FileForget is meant to be used when you are out of quota.</br>
-	 * It deletes the file from remote storage, but leaves it on the local disk and is still accessible from the API.</br>
-	 * When you are out of Cloud space, FileForget can be used to allow calls to FileWrite to keep working without needing to make the user delete files.</br>
-	 * How you decide which files to forget are up to you.</br>
-	 * It could be a simple LRU queue or something more complicated.</br>
-	 * What's not recommended is leaving it up to the user. While it can be an option, requiring the user to manage their Cloud-ized files for a game - for instance, "Which file would you like to delete so that you may store this new one?" removes a significant advantage of using the Cloud in the first place: its transparency.
+	 * There are two different APIs to delete a file, FileDelete and FileForget.<br>
+	 * FileDelete is meant to be used when a user actively deletes a file.<br>
+	 * It deletes it from the local disk, and propagates that delete to the remote storage and any other machine the user uses.<br>
+	 * FileForget is meant to be used when you are out of quota.<br>
+	 * It deletes the file from remote storage, but leaves it on the local disk and is still accessible from the API.<br>
+	 * When you are out of Cloud space, FileForget can be used to allow calls to FileWrite to keep working without needing to make the user delete files.<br>
+	 * How you decide which files to forget are up to you.<br>
+	 * It could be a simple LRU queue or something more complicated.<br>
+	 * What's not recommended is leaving it up to the user. While it can be an option, requiring the user to manage their Cloud-ized files for a game - for
+	 * instance, "Which file would you like to delete so that you may store this new one?" removes a significant advantage of using the Cloud in the first
+	 * place: its transparency.
 	 *
-	 * Once a file has been deleted or forgotten, it can be re-written with FileWrite. Calling FileWrite on a forgotten file makes it persisted again. Currently, rewriting a forgotten file is the only way to make it persisted again.
+	 * Once a file has been deleted or forgotten, it can be re-written with FileWrite. Calling FileWrite on a forgotten file makes it persisted again.
+	 * Currently, rewriting a forgotten file is the only way to make it persisted again.
 	 */
 	public static boolean FileDelete(String pchFile){
 		return nFileDelete(pchFile);
